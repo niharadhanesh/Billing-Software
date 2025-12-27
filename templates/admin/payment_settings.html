@@ -1,0 +1,403 @@
+{% extends 'admin/admin_dashboard.html' %}
+{% block content %}
+
+    <style>
+        body {
+            padding-top: 70px;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .card {
+            border-radius: 10px;
+            background-color: #fff;
+            margin-bottom: 50px;
+        }
+
+        .settings-scroll-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 5px;
+        }
+
+        .settings-scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .settings-scroll-container::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .settings-scroll-container .btn {
+            min-width: 150px;
+            text-align: center;
+            white-space: normal;
+            margin-right: 2px;
+            border-radius: 0;
+            border: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            color: #495057;
+            transition: 0.2s ease-in-out;
+        }
+
+        .settings-scroll-container .btn.active-setting {
+            background-color: #FFAA17;
+            color: white;
+            font-weight: 500;
+            z-index: 1;
+        }
+
+        .payment-image-container {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background-color: #f8f9fa;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-image-preview {
+            max-width: 100%;
+            max-height: 120px;
+            border-radius: 4px;
+        }
+
+        .text-label-group {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .label-input-row {
+            margin-bottom: 10px;
+        }
+
+        .label-input-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .btn-restore {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-restore:hover {
+            background-color: #5a6268;
+            color: white;
+        }
+
+        .btn-load {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-load:hover {
+            background-color: #0b5ed7;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<div class="container">
+  <div class="d-flex justify-content-start mb-3 top-buttons gap-2">
+     <a href="#" class="btn btn-outline-primary custom-btn text-center" data-bs-toggle="modal" data-bs-target="#quickWizardModal">
+  <i class="fas fa-play fa-lg mb-1"></i><br>
+  Quick Start<br>Wizard
+</a>
+
+    <a href="#" class="btn btn-outline-primary custom-btn text-center">
+      <i class="fas fa-book fa-lg mb-1"></i><br>
+      Online<br>User Manual
+    </a>
+    <a href="#" class="btn btn-outline-primary custom-btn text-center">
+      <i class="fas fa-circle-up fa-lg mb-1"></i><br>
+      Upgrade to<br>PRO Now
+    </a>
+  </div>
+
+    <div class="card shadow-sm p-3">
+        <div class="settings-scroll-container mb-3 border-bottom pb-2">
+      <div class="d-flex flex-nowrap gap-1" id="settingTabs">
+        <a href="{% url 'miscellaneous_settings' %}" class="btn btn-light flex-shrink-0">Miscellaneous</a>
+        <a href="{% url 'company_settings' %}" class="btn btn-light flex-shrink-0">Company Settings</a>
+        <a href="{% url 'invoice_settings' %}?section=invoice" class="btn btn-light flex-shrink-0">Invoice Settings</a>
+        <a href="{% url 'order_settings' %}?section=order" class="btn btn-light flex-shrink-0">Order Settings</a>
+        <a href="{% url 'estimate_settings' %}?section=estimate" class="btn btn-light flex-shrink-0">Estimate Settings</a>
+        <a href="{% url 'admin_settings' %}#admin" class="btn flex-shrink-0">Administrator Panel</a>
+        <a href="{% url 'advanced_settings' %}" class="btn btn-light flex-shrink-0">Advanced Settings</a>
+         <a href="{% url 'email_templates' %}" class="btn btn-light flex-shrink-0">Email Templates</a>
+        <a href="{% url 'payment_settings_view' %}" class="btn btn-light flex-shrink-0">Payments</a>
+        <a href="{% url 'purchase_order' %}?section=purchase" class="btn btn-light flex-shrink-0">Purchase Order</a>
+      </div>
+    </div>
+
+        <div id="settingsContent" class="mt-3">
+           
+            <div id="PaymentsSettingsContent" style="display: block;">
+                <form id="paymentSettingsForm" enctype="multipart/form-data" method="post" action="{% url 'save_payment_settings' %}">
+                {% csrf_token %}
+                   
+                    <input type="hidden" id="restoreDefaultPaidImage" name="restore_default_paid_image" value="false">
+                    
+                    <div class="row">
+                      
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="showPaidImage" 
+                                           name="show_paid_on_fully_paid" {% if settings.show_paid_on_fully_paid %}checked{% endif %}>
+                                    <label class="form-check-label" for="showPaidImage">
+                                        Show "PAID" image on fully paid invoices
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="sendPaymentReceipt" 
+                                           name="send_receipt_email_after_payment" {% if settings.send_receipt_email_after_payment %}checked{% endif %}>
+                                    <label class="form-check-label" for="sendPaymentReceipt">
+                                        Send payment receipt email after payment recorded
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="attachInvoiceToReceipt" 
+                                           name="attach_invoice_to_receipt_email" {% if settings.attach_invoice_to_receipt_email %}checked{% endif %}>
+                                    <label class="form-check-label" for="attachInvoiceToReceipt">
+                                        Attach updated invoice to payment receipt email
+                                    </label>
+                                </div>
+                            </div>
+
+                           
+                            <div class="text-label-group">
+                                <h6 class="mb-3">Payment Receipt Text Labels</h6>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Payment Receipt</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="payment_receipt_label" value="{{ settings.payment_receipt_label }}">
+                                        </div>
+                                        
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Payment for Invoice #</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="payment_for_invoice_label" value="{{ settings.payment_for_invoice_label }}">
+                                        </div>
+                                        
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Amount received from:</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="amount_received_from_label" value="{{ settings.amount_received_from_label }}">
+                                        </div>
+                                        
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Description:</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="description_label" value="{{ settings.description_label }}">
+                                        </div>
+                                        
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Payment Received in:</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="payment_received_in_label" value="{{ settings.payment_received_in_label }}">
+                                        </div>
+                                        
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Payment Receipt #</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="payment_receipt_number_label" value="{{ settings.payment_receipt_number_label }}">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Payment Date:</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="payment_date_label" value="{{ settings.payment_date_label }}">
+                                        </div>
+                                        
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Payment Amount:</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="payment_amount_label" value="{{ settings.payment_amount_label }}">
+                                        </div>
+                                        
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Total Amount Due</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="total_amount_due_label" value="{{ settings.total_amount_due_label }}">
+                                        </div>
+                                        
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Total Paid</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="total_paid_label" value="{{ settings.total_paid_label }}">
+                                        </div>
+                                        
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Balance Due</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="balance_due_label" value="{{ settings.balance_due_label }}">
+                                        </div>
+                                        
+                                        <div class="label-input-row">
+                                            <label class="form-label small">Payment Receipt Prefix</label>
+                                            <input type="text" class="form-control form-control-sm" 
+                                                   name="payment_receipt_prefix" value="{{ settings.payment_receipt_prefix }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center mt-3">
+                                    <button type="button" class="btn btn-restore" onclick="restorePaymentDefaults()">
+                                        Restore defaults
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                      
+                        <div class="col-md-6">
+                           
+                            <div class="mb-4">
+                                <h6 class="mb-3">PAID Image for Invoices (max: 40mm X 25mm)</h6>
+                                <div class="payment-image-container mb-3" id="paidImageContainer">
+                                    {% if settings.paid_image %}
+                                        <img id="paidImagePreview" src="{{ settings.paid_image.url }}" 
+                                             alt="PAID Stamp" class="payment-image-preview">
+                                    {% else %}
+                                        <img id="paidImagePreview" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjgwIiB2aWV3Qm94PSIwIDAgMTUwIDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZjhmOWZhIiBzdHJva2U9IiNkZWUyZTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSA1Ii8+Cjx0ZXh0IHg9Ijc1IiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iI2RjMzU0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UEFJRDwvdGV4dD4KPC9zdmc+" 
+                                             alt="PAID Stamp" class="payment-image-preview">
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <input type="file" id="paidImageInput" name="paid_image" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-load" onclick="document.getElementById('paidImageInput').click()">
+                                        Load logo image...
+                                    </button>
+                                    <button type="button" class="btn btn-restore" onclick="restorePaidImageDefault()">
+                                        Restore Default
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                    <div class="row mt-4">
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn px-4 py-2" style="background-color: #FFAA17; color: white;">
+                                Save Settings
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function showSection(button, section) {
+    document.querySelectorAll('#settingTabs button').forEach(btn => btn.classList.remove('active-setting'));
+    button.classList.add('active-setting');
+   
+}
+
+
+let shouldRestoreDefaultImage = false;
+
+
+document.getElementById('paidImageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('paidImagePreview').src = event.target.result;
+          
+            shouldRestoreDefaultImage = false;
+            document.getElementById('restoreDefaultPaidImage').value = 'false';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+
+function restorePaidImageDefault() {
+ 
+    document.getElementById('paidImagePreview').src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjgwIiB2aWV3Qm94PSIwIDAgMTUwIDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZjhmOWZhIiBzdHJva2U9IiNkZWUyZTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSA1Ii8+Cjx0ZXh0IHg9Ijc1IiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iI2RjMzU0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UEFJRDwvdGV4dD4KPC9zdmc+";
+    
+
+    document.getElementById('paidImageInput').value = '';
+    
+
+    shouldRestoreDefaultImage = true;
+    document.getElementById('restoreDefaultPaidImage').value = 'true';
+}
+
+
+function restorePaymentDefaults() {
+    const defaultLabels = {
+        'payment_receipt_label': 'Payment Receipt',
+        'payment_for_invoice_label': 'Payment for Invoice #',
+        'amount_received_from_label': 'Amount received from:',
+        'description_label': 'Description:',
+        'payment_received_in_label': 'Payment Received in:',
+        'payment_receipt_number_label': 'Payment Receipt #',
+        'payment_date_label': 'Payment Date:',
+        'payment_amount_label': 'Payment Amount:',
+        'total_amount_due_label': 'Total Amount Due',
+        'total_paid_label': 'Total Paid',
+        'balance_due_label': 'Balance Due',
+        'payment_receipt_prefix': 'RCPT'
+    };
+    
+    Object.keys(defaultLabels).forEach(name => {
+        const input = document.querySelector(`input[name="${name}"]`);
+        if (input) {
+            input.value = defaultLabels[name];
+        }
+    });
+}
+
+document.getElementById('paymentSettingsForm').addEventListener('submit', function(e) {
+  
+    document.getElementById('restoreDefaultPaidImage').value = shouldRestoreDefaultImage ? 'true' : 'false';
+});
+
+
+</script>
+
+{% endblock %}
+
+
+{% block global_modals %}
+  {% include 'includes/quick_start_modal.html' %}
+{% endblock %}

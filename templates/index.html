@@ -1,0 +1,359 @@
+
+{% extends 'navbar.html' %}
+{% block content %}
+
+{% load static %}
+
+
+<style>
+  .carousel-item {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    opacity: 0; 
+    transition: opacity 1s ease-in-out; 
+  }
+
+  .carousel-item:nth-child(1) {
+    background-image: url('{% static "images/banner2.jpg" %}');
+  }
+
+  .carousel-item:nth-child(2) {
+    background-image: url('{% static "images/banner1.jpg" %}');
+  }
+
+  .carousel-item-next, .carousel-item-prev, .carousel-item.active {
+    opacity: 1; 
+  }
+
+  .carousel-item-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+
+  .hero-text {
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    transform: translateY(-50%);
+    color: #fff;
+    font-size: 3rem;
+    font-weight: bold;
+    z-index: 2;
+    max-width: 600px;
+  }
+
+  @media (max-width: 768px) {
+    .hero-text {
+      font-size: 2rem;
+    }
+
+    .carousel-item {
+      padding-bottom: 75%; 
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .carousel-item {
+      padding-bottom: 50%; 
+    }
+    .hero-text h1{
+        font-size: 70px;
+    }
+  }
+  .pricing-plan {
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .pricing-plan.active {
+    border: 2px solid #ffaa17 !important;
+    box-shadow: 0 0 15px rgba(255, 170, 23, 0.4);
+    background-color: #fff9f0;
+  }
+</style>
+
+
+<div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="3000">
+  <div class="carousel-inner">
+
+    <!-- First Slide -->
+    <div class="carousel-item active">
+      <div class="carousel-item-overlay"></div>
+      <div class="hero-text">
+        <h1 class="mb-3" style="font-weight: bold;">Simplify Your Finances with Seamless Billing</h1>
+    </div>
+    </div>
+
+    <!-- Second Slide -->
+    <div class="carousel-item">
+      <div class="carousel-item-overlay"></div>
+      <div class="hero-text">
+        <h1 class="mb-3" style="font-weight: bold;">Effortless Billing for Modern Businesses</h1>
+    </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!-- ----About-------------------------- -->
+
+<section class="py-5 bg-light" id="about">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <img src="{% static 'images/banner.jpg' %}" alt="About Billing Software" class="img-fluid rounded shadow">
+            </div>
+            <div class="col-md-6">
+                <h2 class="mb-3" style="color:#FFAA17;">About Our Billing Software</h2>
+                <p class="text-muted" style="text-align: justify;">
+                    Our billing software is designed to simplify and automate your financial operations. Built for businesses of all sizes, it provides a robust and intuitive platform to manage billing tasks efficiently and accurately.
+                </p>
+                <ul class="text-muted">
+                    <li> Easy invoice creation and management</li>
+                    <li> Real-time payment tracking</li>
+                    <li> Automated tax and GST calculations</li>
+                    <li> Customizable billing templates</li>
+                    <li> Secure data storage and backups</li>
+                    <li> Insightful reports and analytics</li>
+                    <li> User-friendly dashboard for quick access</li>
+                    <li> 24/7 customer support and regular updates</li>
+                </ul>
+                <p class="text-muted" style="text-align: justify;">
+                    Whether you're a freelancer, small business, or enterprise, our software adapts to your workflow and helps you focus on what really matters — growing your business.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- ----------Features----------------------------- -->
+
+<section class="py-5" id="features">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 style="color: #FFAA17;">Key Features</h2>
+            <p class="text-muted">Powerful tools to manage your billing and finance efficiently.</p>
+        </div>
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <div class="p-4 border rounded shadow-sm h-100">
+                    <i class="bi bi-file-earmark-text fs-1 text-warning"></i>
+                    <h5 class="mt-3">Smart Invoicing</h5>
+                    <p class="text-muted">Create and send professional invoices in seconds with automated numbering and due date tracking.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 border rounded shadow-sm h-100">
+                    <i class="bi bi-wallet2 fs-1 text-warning"></i>
+                    <h5 class="mt-3">Payment Tracking</h5>
+                    <p class="text-muted">Track all incoming payments, get paid faster, and stay on top of your cash flow.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 border rounded shadow-sm h-100">
+                    <i class="bi bi-graph-up-arrow fs-1 text-warning"></i>
+                    <h5 class="mt-3">Detailed Reports</h5>
+                    <p class="text-muted">View financial summaries, revenue trends, and expense breakdowns with easy-to-read charts.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 border rounded shadow-sm h-100">
+                    <i class="bi bi-shield-lock fs-1 text-warning"></i>
+                    <h5 class="mt-3">Secure Data</h5>
+                    <p class="text-muted">Advanced encryption and backups ensure your business data is always protected.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 border rounded shadow-sm h-100">
+                    <i class="bi bi-person-gear fs-1 text-warning"></i>
+                    <h5 class="mt-3">User Management</h5>
+                    <p class="text-muted">Assign roles and permissions to team members to manage billing tasks efficiently.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 border rounded shadow-sm h-100">
+                    <i class="bi bi-cloud-arrow-down fs-1 text-warning"></i>
+                    <h5 class="mt-3">Cloud Access</h5>
+                    <p class="text-muted">Access your billing system anytime, anywhere with secure cloud integration.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row align-items-center">
+      
+      <!-- Left Side: Text Content -->
+      <div class="col-md-6 mb-4 mb-md-0">
+        <h2 class="mb-4" style="color: #FFAA17;">Who Can Benefit from Our Free Billing Software?</h2>
+        <ul class="list-unstyled fs-8">
+          <li class="mb-2"><strong>Small Business Owners</strong> - Manage sales, invoices, and payments easily.</li>
+          <li class="mb-2"><strong>Freelancers & Consultants</strong> - Send professional invoices and track payments.</li>
+          <li class="mb-2"><strong>Retail Shops & Stores</strong> - Generate bills instantly and manage daily sales.</li>
+          <li class="mb-2"><strong>Wholesalers & Distributors</strong> - Track large orders and customer billing.</li>
+          <li class="mb-2"><strong>Service Providers</strong> - Create and share service-based bills efficiently.</li>
+          <li class="mb-2"><strong>Startups & Home Businesses</strong> - Keep control of your finances.</li>
+          <li class="mb-2"><strong>Pharmacies & Medical Stores</strong> - Generate tax-compliant bills and manage stock.</li>
+          <li class="mb-2"><strong>Grocery Stores & Supermarkets</strong> - Print receipts and monitor inventory.</li>
+          <li class="mb-2"><strong>Educational Institutions</strong> - Simplify student fee billing.</li>
+          <li class="mb-2"><strong>Non-Profit Organizations</strong> - Track donations and expenditures.</li>
+        </ul>
+      </div>
+
+      <!-- Right Side: Image -->
+      <div class="col-md-6 text-center">
+        <img src="{% static 'images/img.jpg' %}" alt="Billing Benefits" class="img-fluid rounded">
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="py-5" id="pricing">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="mb-3" style="color: #FFAA17;">Flexible Pricing Plans</h2>
+      <p class="lead">Get started for free. Upgrade only when you need more power.</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <!-- Free Plan -->
+      <div class="col-md-5 col-sm-12 mb-4">
+        <div class="pricing-plan p-4 bg-light h-100 rounded shadow-sm" id="freePlan">
+          <h3 class="mb-3">Free Plan</h3>
+          <ul class="list-unstyled fs-6">
+            <li>Create unlimited invoices</li>
+            <li>Manage clients & services</li>
+            <li>Access basic reports</li>
+            <li>Cloud backup & security</li>
+            <li>Ideal for freelancers & startups</li>
+          </ul>
+          <h4 class="mt-4 text-success">₹0 / month</h4>
+          <small class="text-muted">No credit card required</small>
+        </div>
+      </div>
+
+      <!-- Premium Plan -->
+      <div class="col-md-5 col-sm-12 mb-4">
+        <div class="pricing-plan p-4 bg-light h-100 rounded shadow-sm" id="premiumPlan">
+          <h3 class="mb-3" style="color: #FFAA17;">Premium Plan</h3>
+          <ul class="list-unstyled fs-6">
+            <li>All Free Plan features</li>
+            <li>GST-compliant invoices</li>
+            <li>Inventory & expense tracking</li>
+            <li>Advanced analytics & reports</li>
+            <li>Priority email & chat support</li>
+            <li>Multi-user access for teams</li>
+          </ul>
+          <h4 class="mt-4" style="color: #FFAA17;">₹499 / month</h4>
+          <small class="text-muted">₹5,499 billed yearly or ₹599 billed monthly</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="py-5 bg-light" id="faq">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h2 class="mb-3" style="color: #FFAA17;">Frequently Asked Questions</h2>
+      <p class="lead">Everything you need to know about our billing software.</p>
+    </div>
+
+    <div class="accordion" id="faqAccordion">
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="faq1-heading">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="true" aria-controls="faq1">
+            Is the billing software really free?
+          </button>
+        </h2>
+        <div id="faq1" class="accordion-collapse collapse show" aria-labelledby="faq1-heading" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            Yes! Our free plan gives you access to essential features like invoicing, client management, and reports without any cost.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="faq2-heading">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">
+            What do I get with the premium plan?
+          </button>
+        </h2>
+        <div id="faq2" class="accordion-collapse collapse" aria-labelledby="faq2-heading" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            The premium plan includes all features of the free plan, plus GST-compliant invoices, inventory tracking, team access, advanced reports, and priority support.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="faq3-heading">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">
+            Can I cancel anytime?
+          </button>
+        </h2>
+        <div id="faq3" class="accordion-collapse collapse" aria-labelledby="faq3-heading" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            Absolutely. You can cancel your premium subscription anytime. Your data will remain safe and accessible under the free plan.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="faq4-heading">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">
+            Do you provide customer support?
+          </button>
+        </h2>
+        <div id="faq4" class="accordion-collapse collapse" aria-labelledby="faq4-heading" data-bs-parent="#faqAccordion">
+          <div class="accordion-body">
+            Yes. Free plan users get email support, while premium users enjoy priority email and live chat support.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const plans = document.querySelectorAll('.pricing-plan');
+
+    plans.forEach(plan => {
+      plan.addEventListener('click', function () {
+        plans.forEach(p => p.classList.remove('active')); // Remove active from all
+        this.classList.add('active'); // Add active to clicked one
+      });
+    });
+  });
+</script>
+
+{% endblock %}

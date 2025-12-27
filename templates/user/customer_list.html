@@ -1,0 +1,3205 @@
+{% extends 'user/user_dashboard.html' %}
+{% block content %}
+
+<style>
+    body {
+        padding-top: 70px;
+        background-color: #f8f9fa;
+    }
+
+    .navbar {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .panel {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .card {
+        border-radius: 10px;
+        background-color: #fff;
+        margin-bottom: 20px; 
+    }
+
+.custom-btn {
+    min-width: 107px;
+    min-height: 100px;
+    padding: 12px 8px;
+    font-size: 13px;
+    line-height: 1.2;
+    border-radius: 8px;
+    text-align: center;
+    white-space: normal;
+    word-wrap: break-word;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.custom-btn i {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+
+    .top-buttons {
+        margin-bottom: 15px; 
+    }
+
+   
+    .customer-management-card {
+        min-height: 400px; 
+    }
+
+    .customer-management-card .card-body {
+        padding: 20px;
+        height: calc(100% - 60px); 
+    }
+
+    .customer-management-card .table-responsive {
+        max-height: 300px; 
+        overflow-y: auto;
+    }
+
+    
+    .customer-table {
+        font-size: 14px;
+    }
+
+    .customer-table th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        padding: 12px 8px;
+        text-align: left;
+        position: sticky;
+        top: 0; 
+        z-index: 10;
+    }
+
+    .customer-table td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+
+    .customer-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .type-badge {
+        padding: 3px 8px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .type-client {
+        background-color: #cce5ff;
+        color: #0056b3;
+    }
+
+    .type-vendor {
+        background-color: #ffe6cc;
+        color: #cc4400;
+    }
+
+    .type-both {
+        background-color: #e6f3ff;
+        color: #0080ff;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding: 15px 0;
+    }
+
+    .pagination-info {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .customer-id {
+        font-weight: 600;
+        color: #0056b3;
+    }
+
+    .text-truncate {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+ 
+    .detail-tabs {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-top: 15px; 
+        overflow: hidden;
+    }
+
+    .tab-nav {
+        display: flex;
+        background-color: #e9ecef;
+        border-bottom: 1px solid #dee2e6;
+        padding: 0;
+        margin: 0;
+    }
+
+    .tab-nav button {
+        background-color: #e9ecef;
+        border: none;
+        padding: 10px 15px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-right: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .tab-nav button:hover {
+        background-color: #dee2e6;
+    }
+
+    .tab-nav button.active {
+        background-color: #fff;
+        color: #0056b3;
+        border-bottom: 2px solid #0056b3;
+    }
+
+    .tab-content {
+        padding: 0;
+        background-color: #fff;
+    }
+
+    .tab-pane {
+        display: none;
+        padding: 0;
+    }
+
+    .tab-pane.active {
+        display: block;
+    }
+
+    .tab-table {
+        width: 100%;
+        font-size: 12px;
+        margin: 0;
+    }
+
+    .tab-table th {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 8px 10px;
+        font-weight: 600;
+        font-size: 11px;
+        text-align: left;
+        color: #495057;
+    }
+
+    .tab-table td {
+        padding: 6px 10px;
+        border-bottom: 1px solid #f1f1f1;
+        vertical-align: middle;
+    }
+
+    .tab-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+   
+.category-filter-card {
+    height: 680px; 
+    display: flex;
+    flex-direction: column;
+}
+
+
+.category-filter-card .card-body {
+    flex: 1;
+    overflow-y: auto; 
+    padding: 15px;
+}
+
+
+.category-filter-card .list-group-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.category-filter-card .list-group-item:hover {
+    background-color: #f8f9fa;
+    padding-left: 20px;
+}
+
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+       
+        
+        .customer-management-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+        }
+        
+        .customer-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .customer-table td {
+            font-size: 13px;
+            vertical-align: middle;
+        }
+        
+        .customer-id {
+            font-weight: 600;
+            color: #0056b3;
+        }
+        
+      
+        .detail-tabs {
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            background: #f8f9fa;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 12px;
+            color: #6c757d;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+        
+        .tab-button:first-child {
+            border-radius: 10px 0 0 0;
+        }
+        
+        .tab-button:last-child {
+            border-radius: 0 10px 0 0;
+        }
+        
+        .tab-button.active {
+            background: #0056b3;
+            color: white;
+        }
+        
+        .tab-button:hover:not(.active) {
+            background: #e9ecef;
+        }
+        
+        .tab-content {
+            padding: 20px;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .tab-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .tab-table th,
+        .tab-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 13px;
+        }
+        
+        .tab-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+       
+        .modal-lg {
+            max-width: 1000px;
+        }
+        
+        .modal-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .modal-title {
+            color: #0056b3;
+            font-weight: 600;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-section h6 {
+            color: #0056b3;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .form-control, .form-select {
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 13px;
+        }
+        
+        .copy-checkbox {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            border: none;
+            padding: 8px 20px;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            padding: 8px 20px;
+        }
+
+.modal-backdrop.show {
+  opacity: 0.3;
+}
+
+
+#addCategoryModal {
+  z-index: 1060 !important;
+}
+
+#addCategoryModal .modal-backdrop {
+  z-index: 1055 !important;
+}
+
+
+.modal-open .modal-backdrop + .modal-backdrop {
+  display: none;
+}
+
+.category-option {
+  cursor: pointer;
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.category-option:hover {
+  background-color: #f8f9fa;
+}
+
+.category-option:last-child {
+  border-bottom: none;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  background-color: #fff;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.search-highlight {
+    background-color: #ffeb3b;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+    color: #333;
+    
+}
+
+
+.table-responsive {
+    scroll-behavior: smooth;
+}
+</style>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<div class="container-fluid">
+    <!-- Top Action Buttons -->
+    <div class="d-flex justify-content-start flex-wrap gap-2 mb-3 top-buttons">
+        <button id="addCustomerBtn" class="btn btn-outline-primary custom-btn text-center" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+    <i class="fas fa-plus"></i> Add<br>Customer
+     </button>
+        <button class="btn btn-outline-primary custom-btn text-center" onclick="editCustomer()">
+            <i class="fas fa-user-edit"></i> Edit / View<br>Customer
+        </button>
+        <button id="deleteSelectedBtn" class="btn btn-outline-primary custom-btn text-center" onclick="deleteSelectedCustomers()">
+       <i class="fas fa-trash-alt"></i> Delete<br>Selected
+       </button>
+
+
+
+        <form id="invoicePreviewForm" method="get" action="{% url 'preview_invoice' %}">
+         <input type="hidden" name="customer_id" id="previewCustomerID">
+        </form>
+
+          <button class="btn btn-outline-primary custom-btn text-center" onclick="submitPreviewForm()">
+           <i class="fas fa-file-alt"></i> Preview<br>Invoices
+         </button>
+
+        <a href="#" class="btn btn-outline-primary custom-btn text-center" onclick="printSelectedCustomerInvoices()">
+       <i class="fas fa-print"></i> Print<br>Invoices
+        </a>
+
+        <a href="#" class="btn btn-outline-primary custom-btn text-center" onclick="handleEmailInvoiceClick()">
+      <i class="fas fa-envelope"></i> Email<br>Invoices
+       </a>
+         <button type="button" class="btn btn-outline-primary custom-btn text-center" onclick="handleSMSButtonClick()">
+       <i class="fas fa-sms"></i> SMS<br>Invoices
+        </button>
+
+       <button type="button" class="btn btn-outline-primary custom-btn text-center" data-bs-toggle="modal" data-bs-target="#searchCustomerModal">
+       <i class="fas fa-search"></i> Search<br>Customer
+       </button>
+        <button id="importCustomerBtn" class="btn btn-outline-primary custom-btn text-center" data-bs-toggle="modal" data-bs-target="#importCustomerModal">
+         <i class="fas fa-upload"></i> Import<br>Customer
+       </button>
+        <button class="btn btn-outline-primary custom-btn text-center" onclick="exportCustomerToExcel()">
+       <i class="fas fa-download"></i> Export<br>Customer
+         </button>
+
+        <a href="#" class="btn btn-outline-primary custom-btn text-center" onclick="refreshCustomerList()">
+       <i class="fas fa-sync-alt"></i> Refresh<br>List
+       </a>
+
+    </div>
+
+
+
+<div class="row">
+    <!-- Left Column: Table -->
+    <div class="col-lg-9">
+        <div class="card shadow-sm customer-management-card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Customer Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" style="overflow-x: auto;">
+                    <table class="table table-hover customer-table" style="min-width: 800px;">
+                        <thead>
+                            <tr>
+                                <th width="5%"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                                <th width="10%">Customer ID</th>
+                                <th width="12%">Category</th>
+                                <th width="12%">Customer name</th>
+                                <th width="12%">Contact person</th>
+                                <th width="10%">Customer Tel.</th>
+                                <th width="10%">SMS number</th>
+                                <th width="10%">Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in customers %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="customer-checkbox" 
+                                           value="{{ customer.id }}" 
+                                           name="customer_select"
+                                           data-sms="{{ customer.sms_mobile_number }}"
+                                           data-customer-id="{{ customer.customer_id }}"
+                                           data-business-name="{{ customer.business_name }}"
+                                           data-email="{{ customer.email_address }}">
+                                </td>
+                                <td><span class="customer-id">{{ customer.customer_id }}</span></td>
+                                <td>{{ customer.customer_category.category }}</td>
+                                <td>{{ customer.business_name }}</td>
+                                <td>{{ customer.contact_person }}</td>
+                                <td>{{ customer.telephone_number }}</td>
+                                <td>{{ customer.sms_mobile_number }}</td>
+                                <td>{{ customer.get_customer_type_display }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">No customers found. <a href="#" class="text-decoration-none">Add your first customer</a></p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+       <!-- Detail Tabs Section -->
+  <div class="detail-tabs">
+    <div class="tab-nav" style="overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch;">
+        <button class="tab-button active" onclick="showTab(event, 'invoices')" style="display: inline-block;">
+            <i class="fas fa-file-invoice"></i> Invoices
+        </button>
+        <button class="tab-button" onclick="showTab(event, 'orders')" style="display: inline-block;">
+            <i class="fas fa-shopping-cart"></i> Orders
+        </button>
+        <button class="tab-button" onclick="showTab(event, 'estimates')" style="display: inline-block;">
+            <i class="fas fa-calculator"></i> Estimates
+        </button>
+        <button class="tab-button" onclick="showTab(event, 'payments')" style="display: inline-block;">
+            <i class="fas fa-credit-card"></i> Payments
+        </button>
+        <button class="tab-button" onclick="showTab(event, 'purchase')" style="display: inline-block;">
+            <i class="fas fa-shopping-bag"></i> Purchase Orders
+        </button>
+    </div>
+
+    <div class="tab-content">
+        <!-- Invoices Tab -->
+        <div id="invoices" class="tab-pane active">
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="tab-table" style="min-width: 800px;">
+                    <thead>
+                        <tr>
+                            <th>Issue Date</th>
+                            <th>Invoice ID</th>
+                            <th>Due Date</th>
+                            <th>Recurring</th>
+                            <th>Status</th>
+                            <th>Total Paid</th>
+                            <th>Invoice Total</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Invoice data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-state">
+                <p>No invoices found for selected customer</p>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="orders" class="tab-pane">
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="tab-table" style="min-width: 800px;">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                            <th>Emailed On</th>
+                            <th>Printed On</th>
+                            <th>Subtotal</th>
+                            <th>Extra Cost</th>
+                            <th>Order Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Order data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-state">
+                <p>No orders found for selected customer</p>
+            </div>
+        </div>
+
+        <!-- Estimates Tab -->
+        <div id="estimates" class="tab-pane">
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="tab-table" style="min-width: 800px;">
+                    <thead>
+                        <tr>
+                            <th>Estimate ID</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                            <th>Emailed On</th>
+                            <th>Printed On</th>
+                            <th>Subtotal</th>
+                            <th>Extra Cost</th>
+                            <th>Estimate Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Estimate data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-state">
+                <p>No estimates found for selected customer</p>
+            </div>
+        </div>
+
+        <!-- Payments Tab -->
+        <div id="payments" class="tab-pane">
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="tab-table" style="min-width: 800px;">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Payment ID</th>
+                            <th>Payment Date</th>
+                            <th>Paid By</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Payment data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-state">
+                <p>No payments found for selected customer</p>
+            </div>
+        </div>
+
+        <!-- Purchase Orders Tab -->
+        <div id="purchase" class="tab-pane">
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="tab-table" style="min-width: 800px;">
+                    <thead>
+                        <tr>
+                            <th>Purchase Order ID</th>
+                            <th>Issue Date</th>
+                            <th>Due Date</th>
+                            <th>Vendor</th>
+                            <th>Status</th>
+                            <th>Purchase Order Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Purchase order data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-state">
+                <p>No purchase orders found for selected customer</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Right Column: Category Filter -->
+    <div class="col-lg-3">
+        <div class="card shadow-sm category-filter-card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Category</h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush small">
+                    <!-- Static filter options (do not remove) -->
+                    <a href="?category=all" class="list-group-item list-group-item-action">View all records</a>
+                    <a href="?category=client_vendor" class="list-group-item list-group-item-action">View only Client/Vendor type</a>
+                    <a href="?category=client" class="list-group-item list-group-item-action">View only Client type</a>
+                    <a href="?category=vendor" class="list-group-item list-group-item-action">View only Vendor type</a>
+                    <a href="?category=default" class="list-group-item list-group-item-action">Default</a>
+
+                    <!-- Dynamic category options -->
+                    {% for cat in dynamic_categories %}
+                    <a href="?category={{ cat|slugify }}" class="list-group-item list-group-item-action">
+                        {{ cat }}
+                    </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Import Customer Modal -->
+<div class="modal fade" id="importCustomerModal" tabindex="-1" aria-labelledby="importCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+                <div class="modal-header "  style="background-color: #FFAA17; color: #212529; border-bottom: 1px solid #ffb302;">
+                <h5 class="modal-title text-light" id="importCustomerModalLabel">
+                    <i class="fas fa-upload me-2 text-light"></i>Import Customers from Excel
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Left Panel -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Import source Excel (.XLS) file:</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" id="importFile" accept=".xls,.xlsx" onchange="previewExcel(this)">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-folder-open"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Source XLS file preview:</label>
+                            <div class="border p-3" style="height: 300px; overflow-y: auto; background-color: #f8f9fa;">
+                                <div id="filePreview" class="text-muted">
+                                    Select a file to preview its contents...
+                                </div>
+                            </div>
+                        </div>
+
+                        
+              <div class="mt-3 d-flex justify-content-between">
+            <a href="{% url 'download_excel_template' %}" class="btn btn-warning text-light">
+             <i class="fas fa-download me-1"></i>Download Excel 
+               </a>
+              <button type="button" class="btn btn-primary" onclick="processImport()">Import</button>
+             </div>
+
+                    </div>
+
+                    <!-- Right Panel -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Required Fields in Excel:</label>
+                            <ul class="list-group small">
+                                <li class="list-group-item">CUSTOMER ID</li>
+                                <li class="list-group-item">CUSTOMER NAME</li>
+                                <li class="list-group-item">CATEGORY</li>
+                                <li class="list-group-item">ADDRESS</li>
+                                <li class="list-group-item">TEL</li>
+                                <li class="list-group-item">FAX</li>
+                                <li class="list-group-item">EMAIL</li>
+                                <li class="list-group-item">CONTACT PERSON</li>
+                                <li class="list-group-item">SHIP TO NAME</li>
+                                <li class="list-group-item">SHIP TO ADDRESS</li>
+                                <li class="list-group-item">SHIP TO TEL</li>
+                                <li class="list-group-item">SHIP TO FAX</li>
+                                <li class="list-group-item">DISCOUNT</li>
+                                <li class="list-group-item">SPECIAL TAX 1</li>
+                                <li class="list-group-item">SPECIAL TAX 2</li>
+                                <li class="list-group-item">ACTIVE</li>
+                                <li class="list-group-item">TAX EXEMPTED</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <p class="text-muted small">
+                        Please ensure your Excel file contains all the required columns listed above. 
+                        <a href="#" class="text-decoration-none">More info</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+function processImport() {
+    const fileInput = document.getElementById("importFile");
+    const file = fileInput.files[0];
+    if (!file) {
+        alert("Please select a file to import.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch("{% url 'import_customers_from_excel' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            alert(data.imported + " customers imported successfully!");
+            location.reload();
+        } else {
+            alert("Import failed: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error importing customers:", error);
+        alert("Something went wrong!");
+    });
+}
+</script>
+<script>
+function previewExcel(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        let html = '';
+        workbook.SheetNames.forEach(function(sheetName) {
+            const sheet = workbook.Sheets[sheetName];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            if (rows.length === 0) {
+                html = '<p class="text-danger small">No data found in the Excel file.</p>';
+                return;
+            }
+
+            html += `
+                <table class="table table-sm table-bordered table-hover text-nowrap" style="font-size: 0.8rem;">
+                    <thead class="table-light">
+                        <tr>
+            `;
+
+            rows[0].forEach(cell => {
+                html += `<th class="text-center">${cell}</th>`;
+            });
+
+            html += `</tr></thead><tbody>`;
+
+            for (let i = 1; i < rows.length && i <= 10; i++) {
+                html += `<tr>`;
+                rows[i].forEach(cell => {
+                    html += `<td>${cell !== undefined ? cell : ''}</td>`;
+                });
+                html += `</tr>`;
+            }
+
+            html += `</tbody></table>`;
+        });
+
+        document.getElementById('filePreview').innerHTML = html;
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+</script>
+
+
+<!-- Search Customer Modal -->
+<div class="modal fade search-modal" id="searchCustomerModal" tabindex="-1" aria-labelledby="searchCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header "  style="background-color: #FFAA17; color: #212529; border-bottom: 1px solid #ffb302;">
+                  <h5 class="modal-title text-light" id="searchCustomerModalLabel">
+              <i class="fab fa-searchengin me-2 text-light"></i>Find Text
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="opacity: 0.8;"></button>
+            </div>
+            <div class="modal-body" style="padding: 2rem; background-color: #f8f9fa;">
+                <form id="customerSearchForm">
+                    <!-- Find What Section -->
+                    <div class="mb-3">
+                        <label for="findWhat" class="form-label fw-semibold text-muted">Find What:</label>
+                        <input type="text" class="form-control" id="findWhat" placeholder="Enter text to find">
+                    </div>
+                    
+                    <!-- Find In and Match Section -->
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="findIn" class="form-label fw-semibold text-muted">Find In:</label>
+                            <select class="form-select" id="findIn">
+                                <option value="all">All</option>
+                                <option value="customer_id">Customer ID</option>
+                                <option value="category">Category</option>
+                                <option value="name">Customer Name</option>
+                                <option value="contact_person">Contact Person</option>
+                                <option value="telephone">Customer Telephone</option>
+                                <option value="sms_number">SMS Number</option>
+                                <option value="type">Type</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="matchType" class="form-label fw-semibold text-muted">Match:</label>
+                            <select class="form-select" id="matchType">
+                                <option value="any_part">Any part of field</option>
+                                <option value="whole_field">Whole field</option>
+                                <option value="beginning">From beginning of field</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Search Direction Section -->
+                    <div class="mb-3">
+                        <label for="searchDirection" class="form-label fw-semibold text-muted">Search:</label>
+                        <select class="form-select" id="searchDirection">
+                            <option value="down">Down</option>
+                            <option value="up">Up</option>
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Checkboxes Section -->
+                    <div class="d-flex gap-4 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="matchCase">
+                            <label class="form-check-label fw-medium text-muted" for="matchCase">
+                                Match Case
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="matchFormat">
+                            <label class="form-check-label fw-medium text-muted" for="matchFormat">
+                                Match Format
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color: #f8f9fa; border-top: 1px solid #dee2e6;">
+                <button type="button" class="btn btn-primary px-4" onclick="findNext()">
+                    Find Next
+                </button>
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentSearchResults = [];
+let currentSearchIndex = -1;
+
+function findNext() {
+    const findWhat = document.getElementById('findWhat').value.trim();
+    const findIn = document.getElementById('findIn').value;
+    const matchType = document.getElementById('matchType').value;
+    const searchDirection = document.getElementById('searchDirection').value;
+    const matchCase = document.getElementById('matchCase').checked;
+    const matchFormat = document.getElementById('matchFormat').checked;
+    
+    if (!findWhat) {
+        alert('Please enter text to find');
+        return;
+    }
+    
+    
+    clearHighlights();
+    
+  
+    searchCustomerTable(findWhat, findIn, matchType, matchCase);
+    
+   
+    if (currentSearchResults.length > 0) {
+        navigateToNextResult(searchDirection);
+    }
+    
+ 
+    if (currentSearchResults.length > 0) {
+       
+    }
+}
+
+function searchCustomerTable(searchText, searchField, matchType, matchCase) {
+    const table = document.querySelector('.customer-table tbody');
+    const rows = table.querySelectorAll('tr');
+    
+    let searchValue = matchCase ? searchText : searchText.toLowerCase();
+    currentSearchResults = [];
+    
+    rows.forEach((row, rowIndex) => {
+        if (searchField === 'all') {
+           
+            const cells = row.querySelectorAll('td');
+            cells.forEach((cell, cellIndex) => {
+                if (cellIndex === 0) return; 
+                
+                let cellText = matchCase ? cell.textContent.trim() : cell.textContent.trim().toLowerCase();
+                if (matchSearchText(cellText, searchValue, matchType)) {
+                    highlightText(cell, searchText, matchCase);
+                    currentSearchResults.push({ row: rowIndex, cell: cellIndex, element: cell });
+                }
+            });
+        } else {
+            // Search specific column
+            const columnIndex = getColumnIndex(searchField);
+            if (columnIndex !== -1 && row.cells[columnIndex]) {
+                const cell = row.cells[columnIndex];
+                let cellText = matchCase ? cell.textContent.trim() : cell.textContent.trim().toLowerCase();
+                if (matchSearchText(cellText, searchValue, matchType)) {
+                    highlightText(cell, searchText, matchCase);
+                    currentSearchResults.push({ row: rowIndex, cell: columnIndex, element: cell });
+                }
+            }
+        }
+    });
+    
+    if (currentSearchResults.length === 0) {
+        alert('No matching records found');
+    } else {
+        // Show results count
+        console.log(`Found ${currentSearchResults.length} results`);
+    }
+}
+
+function highlightText(cell, searchText, matchCase) {
+    const originalText = cell.textContent;
+    const searchValue = matchCase ? searchText : searchText.toLowerCase();
+    const cellText = matchCase ? originalText : originalText.toLowerCase();
+    
+  
+    const regex = new RegExp(`(${escapeRegExp(searchValue)})`, matchCase ? 'g' : 'gi');
+    const highlightedText = originalText.replace(regex, '<mark class="search-highlight">$1</mark>');
+    
+    cell.innerHTML = highlightedText;
+    
+   
+}
+
+function clearHighlights() {
+
+    const highlightedElements = document.querySelectorAll('.search-highlight');
+    highlightedElements.forEach(element => {
+        const parent = element.parentNode;
+        parent.replaceChild(document.createTextNode(element.textContent), element);
+        parent.normalize();
+    });
+    
+ 
+    currentSearchResults = [];
+    currentSearchIndex = -1;
+}
+
+function navigateToNextResult(direction) {
+    if (currentSearchResults.length === 0) return;
+    
+    if (direction === 'down' || direction === 'all') {
+        currentSearchIndex = (currentSearchIndex + 1) % currentSearchResults.length;
+    } else if (direction === 'up') {
+        currentSearchIndex = currentSearchIndex <= 0 ? currentSearchResults.length - 1 : currentSearchIndex - 1;
+    }
+    
+    // Scroll to the current result
+    const currentResult = currentSearchResults[currentSearchIndex];
+    if (currentResult && currentResult.element) {
+        currentResult.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Add active highlight to current result
+        document.querySelectorAll('.search-highlight').forEach(el => el.classList.remove('active-highlight'));
+        const activeHighlight = currentResult.element.querySelector('.search-highlight');
+        if (activeHighlight) {
+            activeHighlight.classList.add('active-highlight');
+        }
+    }
+}
+
+function matchSearchText(text, searchValue, matchType) {
+    switch(matchType) {
+        case 'whole_field':
+            return text.trim() === searchValue;
+        case 'beginning':
+            return text.startsWith(searchValue);
+        case 'any_part':
+        default:
+            return text.includes(searchValue);
+    }
+}
+
+function getColumnIndex(field) {
+    const fieldMap = {
+        'customer_id': 1,
+        'category': 2,
+        'name': 3,
+        'contact_person': 4,
+        'telephone': 5,
+        'sms_number': 6,
+        'type': 7
+    };
+    return fieldMap[field] || -1;
+}
+
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+
+document.getElementById('searchCustomerModal').addEventListener('hidden.bs.modal', function () {
+
+    currentSearchIndex = -1;
+    
+    document.querySelectorAll('.search-highlight').forEach(el => el.classList.remove('active-highlight'));
+});
+
+
+document.getElementById('findWhat').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        findNext();
+    }
+});
+
+
+function addClearHighlightsButton() {
+   
+    const clearButton = document.createElement('button');
+    clearButton.type = 'button';
+    clearButton.className = 'btn btn-outline-secondary px-4';
+    clearButton.textContent = 'Clear Highlights';
+    clearButton.onclick = clearHighlights;
+    
+   
+}
+
+
+</script>
+
+<!-- Email Invoice Modal -->
+<div class="modal fade" id="emailInvoiceModal" tabindex="-1" aria-labelledby="emailInvoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header"style="background-color: #FFAA17; color: #212529; border-bottom: 1px solid #ffb302;">
+                <h5 class="modal-title text-light" id="emailInvoiceModalLabel">
+                    <i class="fas fa-envelope me-2"></i>E-Mail Invoices List
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="emailInvoiceForm">
+                    <div class="row">
+                        <!-- Left Side -->
+                        <div class="col-lg-8">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="emailTo" class="form-label">Email to address</label>
+                                    <input type="email" class="form-control" id="emailTo" name="email_to" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="carbonCopy" class="form-label">Carbon Copy to</label>
+                                    <input type="email" class="form-control" id="carbonCopy" name="carbon_copy">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="emailSubject" class="form-label">Subject</label>
+                                <input type="text" class="form-control" id="emailSubject" name="subject" value="Invoices List" required>
+                            </div>
+
+                            <!-- Email Editor Toolbar -->
+                            <div class="mb-2 d-flex gap-2">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="showDesignView()">E-Mail message</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="showSourceView()">HTML source code</button>
+                            </div>
+
+                            <div class="toolbar border rounded p-2 mb-2 d-flex flex-wrap align-items-center gap-1 bg-light">
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('undo')" title="Undo">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('redo')" title="Redo">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                                <div class="vr mx-1"></div>
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('bold')" title="Bold">
+                                    <i class="fas fa-bold"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('italic')" title="Italic">
+                                    <i class="fas fa-italic"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('underline')" title="Underline">
+                                    <i class="fas fa-underline"></i>
+                                </button>
+                                <div class="vr mx-1"></div>
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('justifyLeft')" title="Align Left">
+                                    <i class="fas fa-align-left"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('justifyCenter')" title="Align Center">
+                                    <i class="fas fa-align-center"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('justifyRight')" title="Align Right">
+                                    <i class="fas fa-align-right"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('justifyFull')" title="Justify">
+                                    <i class="fas fa-align-justify"></i>
+                                </button>
+                                <div class="vr mx-1"></div>
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('insertUnorderedList')" title="Bullet List">
+                                    <i class="fas fa-list-ul"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light border" onclick="formatText('insertOrderedList')" title="Numbered List">
+                                    <i class="fas fa-list-ol"></i>
+                                </button>
+                                <div class="vr mx-1"></div>
+                                <select id="fontSize" class="form-select form-select-sm" style="width: 80px;" onchange="formatText('fontSize', this.value)">
+                                    <option value="1">8pt</option>
+                                    <option value="2">10pt</option>
+                                    <option value="3" selected>12pt</option>
+                                    <option value="4">14pt</option>
+                                    <option value="5">18pt</option>
+                                    <option value="6">24pt</option>
+                                    <option value="7">36pt</option>
+                                </select>
+                                <div class="vr mx-1"></div>
+                                <input type="color" id="fontColor" class="color-picker" title="Font Color" onchange="formatText('foreColor', this.value)" value="#000000">
+                                <input type="color" id="bgColor" class="color-picker" title="Background Color" onchange="formatText('hiliteColor', this.value)" value="#ffffff">
+                            </div>
+
+                            <div id="emailEditor" contenteditable="true" class="border bg-white p-3" style="min-height: 250px;"></div>
+                        </div>
+
+                        <!-- Right Side: Attachments -->
+                        <div class="col-lg-4">
+                            <label class="form-label">Attachment(s)</label>
+                            <div class="border p-3 bg-light" style="min-height: 300px;">
+                                <div id="attachmentsList"></div>
+                                <div class="text-center mt-3">
+                                    <small class="text-muted">Double click on attachment to View</small>
+                                </div>
+                                <div class="mt-2 d-flex">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="addAttachment()">
+                                        <i class="fas fa-plus"></i> Add attachment file...
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm ms-2" onclick="removeAttachment()">
+                                        <i class="fas fa-minus"></i> Remove attachment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-4">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            You can create predefined invoice, order, estimate and payment receipt email templates under Main menu / Settings / E-Mail templates tab.
+                        </small>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning text-light" onclick="sendEmail()">
+                    <i class="fas fa-paper-plane"></i> Send Email
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="stopSending()">
+                    <i class="fas fa-stop"></i> Stop Sending
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let isSourceMode = false;
+    let savedContent = '';
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const editor = document.getElementById('emailEditor');
+
+        editor.addEventListener('focus', () => {
+            document.execCommand('defaultParagraphSeparator', false, 'p');
+        });
+
+        editor.addEventListener('blur', saveSelection);
+
+        editor.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                document.execCommand('insertText', false, '\t');
+            }
+        });
+
+        editor.addEventListener('mouseup', updateToolbar);
+        editor.addEventListener('keyup', updateToolbar);
+
+        const toolbarButtons = document.querySelectorAll('.toolbar button, .toolbar select, .toolbar input');
+        toolbarButtons.forEach(button => {
+            button.addEventListener('click', e => e.stopPropagation());
+            button.addEventListener('change', e => e.stopPropagation());
+        });
+
+        const emailButton = document.querySelector('a[href="#"]:has(i.fas.fa-envelope)');
+        if (emailButton) {
+            emailButton.setAttribute('onclick', 'handleEmailInvoiceClick()');
+        }
+    });
+
+    function saveSelection() {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            savedSelection = selection.getRangeAt(0);
+        }
+    }
+
+    function restoreSelection() {
+        if (savedSelection) {
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(savedSelection);
+        }
+    }
+
+    function formatText(command, value = null) {
+        const editor = document.getElementById('emailEditor');
+        editor.focus();
+        restoreSelection();
+        if (value !== null) {
+            document.execCommand(command, false, value);
+        } else {
+            document.execCommand(command, false);
+        }
+        updateToolbar();
+    }
+
+    function updateToolbar() {
+        const buttons = document.querySelectorAll('.toolbar button');
+        buttons.forEach(button => {
+            const command = button.getAttribute('onclick');
+            if (command) {
+                const match = command.match(/formatText\('([^']+)'/);
+                if (match) {
+                    button.classList.toggle('active', document.queryCommandState(match[1]));
+                }
+            }
+        });
+    }
+
+    function showSourceView() {
+        const editor = document.getElementById('emailEditor');
+        if (!isSourceMode) {
+            savedContent = editor.innerHTML;
+            editor.innerText = savedContent;
+            editor.style.fontFamily = 'monospace';
+            editor.style.fontSize = '12px';
+            isSourceMode = true;
+        }
+    }
+
+    function showDesignView() {
+        const editor = document.getElementById('emailEditor');
+        if (isSourceMode) {
+            const sourceContent = editor.innerText;
+            editor.innerHTML = sourceContent;
+            editor.style.fontFamily = 'Arial, sans-serif';
+            editor.style.fontSize = '14px';
+            isSourceMode = false;
+        }
+    }
+
+
+let uploadedFiles = [];
+let autoGeneratedPdf = null; 
+
+function handleEmailInvoiceClick() {
+    const selected = document.querySelectorAll('.customer-checkbox:checked');
+    if (selected.length === 0) return alert('Select at least one customer.');
+    if (selected.length > 1) return alert('Select only one customer at a time.');
+
+    const customer = selected[0];
+    const data = {
+        id: customer.dataset.customerId,
+        businessName: customer.dataset.businessName,
+        email: customer.dataset.email,
+        contactPerson: customer.dataset.contactPerson || 'Customer'
+    };
+
+    populateEmailModal(data);
+    const modal = new bootstrap.Modal(document.getElementById('emailInvoiceModal'));
+    modal.show();
+}
+
+function populateEmailModal(data) {
+    document.getElementById('emailTo').value = data.email || '';
+    document.getElementById('emailSubject').value = `Invoices List - ${data.businessName}`;
+    document.getElementById('emailEditor').innerHTML = '';
+    
+    // Reset uploaded files array
+    uploadedFiles = [];
+    
+    // Set auto-generated PDF data
+    autoGeneratedPdf = {
+        customerId: data.id,
+        businessName: data.businessName,
+        filename: `${data.businessName}_Invoices_List.PDF`
+    };
+    
+    generateAttachments(data.id, data.businessName);
+}
+
+function generateAttachments(customerId, businessName) {
+    const attachmentsList = document.getElementById('attachmentsList');
+    attachmentsList.innerHTML = `
+        <div class="attachment-item d-flex align-items-center justify-content-between p-2 border rounded mb-2 bg-white" 
+             data-type="auto-generated" data-file-id="auto_pdf">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-file-pdf text-danger me-2" style="font-size: 1.2em;"></i>
+                <div>
+                    <div class="fw-bold">${businessName}_Invoices_List.PDF</div>
+                    <small class="text-muted">Auto-generated Invoice List</small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+             
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeAutoGeneratedPdf(this)" title="Remove auto-generated PDF">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>`;
+}
+
+function removeAutoGeneratedPdf(btn) {
+    // Remove the auto-generated PDF from UI
+    btn.closest('.attachment-item').remove();
+    
+    // Mark auto-generated PDF as removed
+    autoGeneratedPdf = null;
+    
+    // Show confirmation
+    alert('Auto-generated invoice PDF removed. It will not be included in the email.');
+}
+
+function addAttachment() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.doc,.docx,.txt,.jpg,.jpeg,.png';
+    input.multiple = true;
+    
+    input.onchange = function (e) {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+        
+        files.forEach(file => {
+            // Validate file size (max 10MB per file)
+            if (file.size > 10 * 1024 * 1024) {
+                alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+                return;
+            }
+            
+            // Read file as base64
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fileData = {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    data: e.target.result.split(',')[1]
+                };
+                
+                uploadedFiles.push(fileData);
+                addAttachmentToUI(file);
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+    
+    input.click();
+}
+
+function addAttachmentToUI(file) {
+    const icon = getFileIcon(file.name);
+    const list = document.getElementById('attachmentsList');
+    const fileId = 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    const attachmentHTML = `
+        <div class="attachment-item d-flex align-items-center justify-content-between p-2 border rounded mb-2 bg-white" 
+             data-type="additional" data-file-id="${fileId}">
+            <div class="d-flex align-items-center">
+                <i class="${icon} me-2" style="font-size: 1.2em;"></i>
+                <div>
+                    <div class="fw-bold">${file.name}</div>
+                    <small class="text-muted">${(file.size / 1024).toFixed(2)} KB</small>
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeAttachmentItem(this, '${fileId}')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>`;
+    
+    list.insertAdjacentHTML('beforeend', attachmentHTML);
+}
+
+function getFileIcon(name) {
+    const ext = name.split('.').pop().toLowerCase();
+    const icons = {
+        pdf: 'fas fa-file-pdf text-danger',
+        doc: 'fas fa-file-word text-primary',
+        docx: 'fas fa-file-word text-primary',
+        txt: 'fas fa-file-alt text-secondary',
+        jpg: 'fas fa-file-image text-success',
+        jpeg: 'fas fa-file-image text-success',
+        png: 'fas fa-file-image text-success'
+    };
+    return icons[ext] || 'fas fa-file text-secondary';
+}
+
+function removeAttachmentItem(btn, fileId) {
+    // Remove from UI
+    btn.closest('.attachment-item').remove();
+    
+    // Remove from uploadedFiles array if it's an additional file
+    if (fileId) {
+        uploadedFiles = uploadedFiles.filter(file => {
+            return file.name !== btn.closest('.attachment-item').querySelector('.fw-bold').textContent;
+        });
+    }
+}
+
+function removeAttachment() {
+    const items = document.querySelectorAll('.attachment-item[data-type="additional"]');
+    if (items.length) {
+        const lastItem = items[items.length - 1];
+        const fileName = lastItem.querySelector('.fw-bold').textContent;
+        
+        uploadedFiles = uploadedFiles.filter(file => file.name !== fileName);
+        lastItem.remove();
+    }
+}
+
+function sendEmail() {
+    const emailTo = document.getElementById('emailTo').value;
+    const carbonCopy = document.getElementById('carbonCopy').value;
+    const subject = document.getElementById('emailSubject').value;
+    const message = isSourceMode ? 
+        document.getElementById('emailEditor').innerText : 
+        document.getElementById('emailEditor').innerHTML;
+
+    // Validate required fields
+    if (!emailTo || !subject) {
+        alert('Please fill in Email and Subject.');
+        return;
+    }
+    
+    if (!message.trim()) {
+        alert('Email message cannot be empty.');
+        return;
+    }
+
+    // Get customer data from selected customer
+    const selected = document.querySelector('.customer-checkbox:checked');
+    const customerId = selected ? selected.dataset.customerId : '';
+    const businessName = selected ? selected.dataset.businessName : 'Customer';
+
+    // Prepare attachments array with uploaded files
+    const attachments = uploadedFiles.map(file => ({
+        filename: file.name,
+        file_data: file.data,
+        content_type: file.type || 'application/octet-stream',
+        size: file.size
+    }));
+
+    // Prepare data for sending
+    const emailData = {
+        email_to: emailTo,
+        carbon_copy: carbonCopy,
+        subject: subject,
+        message: message,
+        customer_id: customerId,
+        business_name: businessName,
+        attachments: attachments,
+        include_auto_pdf: autoGeneratedPdf !== null, // Send flag to include auto-generated PDF
+        auto_pdf_data: autoGeneratedPdf // Send auto-generated PDF data
+    };
+
+    // Show loading state
+    const sendButton = document.querySelector('.btn-warning');
+    const originalText = sendButton.innerHTML;
+    sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    sendButton.disabled = true;
+
+    // Calculate total attachments for success message
+    let totalAttachments = attachments.length;
+    if (autoGeneratedPdf !== null) {
+        totalAttachments += 1;
+    }
+
+    // Send email via AJAX
+    fetch('/send-email-invoice/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(emailData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Email sent successfully with ${totalAttachments} attachment${totalAttachments !== 1 ? 's' : ''}!`);
+            bootstrap.Modal.getInstance(document.getElementById('emailInvoiceModal')).hide();
+            
+            // Clear uploaded files and reset auto-generated PDF
+            uploadedFiles = [];
+            autoGeneratedPdf = null;
+        } else {
+            alert('Error sending email: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error sending email: ' + error.message);
+    })
+    .finally(() => {
+        // Reset button state
+        sendButton.innerHTML = originalText;
+        sendButton.disabled = false;
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function stopSending() {
+    alert('Email sending stopped.');
+}
+
+function testEmailConfiguration() {
+    fetch('/test-email/', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Email configuration is working correctly!');
+        } else {
+            alert('Email configuration error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error testing email configuration: ' + error.message);
+    });
+}
+
+// Enhanced email editor with better HTML handling
+function formatText(command, value = null) {
+    const editor = document.getElementById('emailEditor');
+    editor.focus();
+    
+    if (savedSelection) {
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(savedSelection);
+    }
+    
+    if (value !== null) {
+        document.execCommand(command, false, value);
+    } else {
+        document.execCommand(command, false);
+    }
+    
+    updateToolbar();
+    saveSelection();
+}
+
+
+// Initialize templates when modal opens
+document.addEventListener('DOMContentLoaded', function() {
+    const emailModal = document.getElementById('emailInvoiceModal');
+    if (emailModal) {
+        emailModal.addEventListener('shown.bs.modal', function() {
+            addTemplateButtons();
+        });
+    }
+});
+</script>
+
+<!-- SMS Modal -->
+<div class="modal fade" id="smsModal" tabindex="-1" aria-labelledby="smsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #FFAA17; color: #212529; border-bottom: 1px solid #ffb302;">
+       <h5 class="modal-title text-light" id="smsModalLabel">
+    <i class="fas fa-bell me-2 text-light"></i>Send SMS Notification</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <!-- Left Section -->
+          <div class="col-md-8">
+            <div class="mb-3">
+              <label class="form-label">SMS number (comma-separated)</label>
+              <input type="text" class="form-control" id="smsNumber" placeholder="">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">SMS Text</label>
+              <textarea class="form-control" id="smsText" rows="5" placeholder="Double click to insert info"></textarea>
+              <div class="text-end">
+                <small class="text-muted" id="charCount">0/160 characters</small>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">SMS message type</label>
+              <div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="smsType" id="normalSMS" value="normal" checked>
+                  <label class="form-check-label" for="normalSMS">Normal SMS (160 chars)</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="smsType" id="unicodeSMS" value="unicode">
+                  <label class="form-check-label" for="unicodeSMS">Unicode SMS (70 chars)</label>
+                </div>
+              </div>
+            </div>
+            <div class="bg-light p-3 rounded">
+              <h6>Tips</h6>
+              <p class="mb-0">Use country code without + (e.g., 918435307545). Avoid special characters in normal SMS.</p>
+            </div>
+          </div>
+
+          <!-- Right Section: Insert Options -->
+          <div class="col-md-4">
+            <div class="bg-light p-3 rounded h-100">
+  <h6>Insert Options</h6>
+  <div class="list-group list-group-flush">
+    <button type="button" class="list-group-item" onclick="insertToken('Company_Name')">&#123;&#123;Company_Name&#125;&#125;</button>
+    <button type="button" class="list-group-item" onclick="insertToken('Company_Email')">&#123;&#123;Company_Email&#125;&#125;</button>
+    <button type="button" class="list-group-item" onclick="insertToken('Customer_ID')">&#123;&#123;Customer_ID&#125;&#125;</button>
+    <button type="button" class="list-group-item" onclick="insertToken('Customer_Name')">&#123;&#123;Customer_Name&#125;&#125;</button>
+    <button type="button" class="list-group-item" onclick="insertToken('Customer_Email')">&#123;&#123;Customer_Email&#125;&#125;</button>
+    <button type="button" class="list-group-item" onclick="insertToken('Current_Date')">&#123;&#123;Current_Date&#125;&#125;</button>
+  </div>
+</div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+        <button class="btn btn-warning text-light" onclick="confirmSMS()"><i class="fas fa-check"></i> Confirm SMS cost</button>
+        <button class="btn btn-primary" onclick="sendSMS()"><i class="fas fa-paper-plane"></i> Send SMS</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let smsModal;
+let selectedCustomerData = {};
+let companyData = {}; 
+
+document.addEventListener('DOMContentLoaded', function () {
+    smsModal = new bootstrap.Modal(document.getElementById('smsModal'));
+    const textarea = document.getElementById('smsText');
+
+    textarea.addEventListener('input', updateCharacterCount);
+
+    document.querySelectorAll('input[name="smsType"]').forEach(radio => {
+        radio.addEventListener('change', updateCharacterCount);
+    });
+    
+    fetchCompanyData();
+});
+
+function fetchCompanyData() {
+    fetch('/get-company-data/')
+        .then(response => response.json())
+        .then(data => {
+            companyData = {
+                Company_Name: data.company_name || '',
+                Company_Email: data.email || ''
+            };
+        })
+        .catch(error => {
+            console.error('Error fetching company data:', error);
+            companyData = {
+                Company_Name: '{{ company.company_name|default:"" }}',
+                Company_Email: '{{ company.email|default:"" }}'
+            };
+        });
+}
+
+function handleSMSButtonClick() {
+    const selected = document.querySelectorAll('.customer-checkbox:checked');
+    if (selected.length === 0) {
+        alert('Please select at least one customer to send SMS.');
+        return;
+    }
+
+    const smsNumbers = Array.from(selected).map(cb => cb.dataset.sms).filter(Boolean);
+    document.getElementById('smsNumber').value = smsNumbers.join(', ');
+
+    const first = selected[0].dataset;
+    selectedCustomerData = {
+        Customer_ID: first.customerId || '',
+        Customer_Name: first.contactPerson || '',
+        Customer_Email: first.email || '',
+        Business_Name: first.businessName || '',
+        Current_Date: new Date().toLocaleDateString('en-GB')
+    };
+
+    document.getElementById('smsText').value = '';
+    document.getElementById('normalSMS').checked = true;
+    updateCharacterCount();
+
+    smsModal.show();
+}
+
+function insertToken(tokenName) {
+    let value = '';
+
+    if (tokenName === 'Company_Name' || tokenName === 'Company_Email') {
+        value = companyData[tokenName] || '';
+    } else if (tokenName === 'Customer_Name') {
+        value = selectedCustomerData['Business_Name'] || '';
+    } else {
+        value = selectedCustomerData[tokenName] || '';
+    }
+
+    insertText(value);
+}
+
+function insertText(text) {
+    const textarea = document.getElementById('smsText');
+    const cursorPos = textarea.selectionStart;
+    const before = textarea.value.substring(0, cursorPos);
+    const after = textarea.value.substring(cursorPos);
+    textarea.value = before + text + after;
+    textarea.focus();
+    textarea.setSelectionRange(cursorPos + text.length, cursorPos + text.length);
+    updateCharacterCount();
+}
+
+function updateCharacterCount() {
+    const textarea = document.getElementById('smsText');
+    const isUnicode = document.getElementById('unicodeSMS').checked;
+    const maxLength = isUnicode ? 70 : 160;
+    const currentLength = textarea.value.length;
+    document.getElementById('charCount').textContent = `${currentLength}/${maxLength} characters`;
+}
+
+function confirmSMS() {
+    const phone = document.getElementById('smsNumber').value;
+    const msg = document.getElementById('smsText').value;
+    if (!phone.trim() || !msg.trim()) {
+        alert('Please fill both SMS number and message.');
+        return;
+    }
+    alert('SMS cost confirmation logic goes here.');
+}
+
+function sendSMS() {
+    const phone = document.getElementById('smsNumber').value;
+    const msg = document.getElementById('smsText').value;
+    if (!phone.trim() || !msg.trim()) {
+        alert('Please fill both SMS number and message.');
+        return;
+    }
+    alert('SMS sending logic goes here.');
+    smsModal.hide();
+}
+</script>
+
+
+<!-- Add Customer Modal -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #FFAA17; color: #212529; border-bottom: 1px solid #ffb302;">
+        <h5 class="modal-title text-light">
+          <i class="fas fa-user-plus me-2"></i> Add New Customer
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addCustomerForm" enctype="multipart/form-data" method="post" action="{% url 'add_customer' %}">
+          {% csrf_token %}
+          <div class="container-fluid">
+            <!-- Customer ID, Category, Status -->
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="form-label">Customer ID</label>
+                <input type="text" class="form-control form-control-sm" name="customer_id" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Category</label>
+                <div class="position-relative">
+                  <input type="text" class="form-control form-control-sm" 
+                         id="categoryInput" 
+                         name="category_name" 
+                         placeholder="Enter category"
+                         autocomplete="off"
+                         onclick="toggleCategoryDropdown()"
+                         oninput="filterCategories(this.value)"
+                         required>
+                  <input type="hidden" name="customer_category" id="categoryId">
+                  <div class="dropdown-menu w-100" id="categoryDropdown" style="display: none; max-height: 200px; overflow-y: auto;">
+                     <!-- Static default option -->
+                 <div class="dropdown-item category-option" 
+                   data-id="" 
+                  data-name="Default"
+                     onclick="selectCategory('', 'Default')">
+                    Default
+                </div>
+                    {% for category in categories %}
+                    <div class="dropdown-item category-option" 
+                         data-id="{{ category.id }}" 
+                         data-name="{{ category.category }}"
+                         onclick="selectCategory({{ category.id }}, '{{ category.category }}')">
+                      {{ category.category }}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label d-block">Status</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="status" value="Active" checked id="statusActive">
+                  <label class="form-check-label" for="statusActive">Active</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Invoice and Ship To sections -->
+            <div class="row mb-3 align-items-center">
+              <div class="col-md-5">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-file-invoice me-1"></i>Invoice to (appears on invoices)</h6>
+                  <label class="form-label">Business name</label>
+                  <input type="text" class="form-control form-control-sm" name="business_name" required>
+                  <label class="form-label mt-2">Address</label>
+                  <textarea class="form-control form-control-sm" name="address" rows="3" required></textarea>
+                </div>
+              </div>
+              <div class="col-md-2 text-center">
+                <input type="checkbox" class="form-check-input mb-1" id="sameAsInvoice" onchange="copyInvoiceToShip()">
+                <label for="sameAsInvoice" class="form-check-label">Same as Invoice</label>
+              </div>
+              <div class="col-md-5">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-shipping-fast me-1"></i>Ship to (appears on invoices)</h6>
+                  <label class="form-label">Ship to name</label>
+                  <input type="text" class="form-control form-control-sm" name="ship_to_name">
+                  <label class="form-label mt-2">Address</label>
+                  <textarea class="form-control form-control-sm" name="shipping_address" rows="3"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact sections -->
+            <div class="row mb-3 align-items-center">
+              <div class="col-md-5">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-user me-1"></i>Contact</h6>
+                  <label class="form-label">Contact person</label>
+                  <input type="text" class="form-control form-control-sm" name="contact_person" required>
+                 <label class="form-label mt-2">E-mail address</label>
+               <input type="email" class="form-control form-control-sm" name="email_address" id="emailAddress" required>
+              <small class="text-danger d-none" id="emailError">Invalid email format</small>
+
+                  <div class="row mt-2">
+                    <div class="col">
+                      <label class="form-label">Tel. number</label>
+                      <input type="text" class="form-control form-control-sm" name="telephone_number" required>
+                    </div>
+                    <div class="col">
+                      <label class="form-label">Fax</label>
+                      <input type="text" class="form-control form-control-sm" name="fax_number">
+                    </div>
+                  </div>
+                 <label class="form-label mt-2">Mobile number for SMS</label>
+              <input type="text" class="form-control form-control-sm" name="sms_mobile_number" id="smsMobileNumber">
+                <small class="text-danger d-none" id="mobileError">Phone number must be 10 digits</small>
+
+                </div>
+              </div>
+              <div class="col-md-2 text-center">
+                <input type="checkbox" class="form-check-input mb-1" id="sameAsContact" onchange="copyContactToShip()">
+                <label for="sameAsContact" class="form-check-label">Same as Contact</label>
+              </div>
+              <div class="col-md-5">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-user me-1"></i>Ship To Contact</h6>
+                  <label class="form-label">Contact person</label>
+                  <input type="text" class="form-control form-control-sm" name="ship_to_contact_person">
+                 <label class="form-label mt-2">E-mail address</label>
+               <input type="email" class="form-control form-control-sm" name="ship_to_email_address" id="shipToEmail">
+                <small class="text-danger d-none" id="shipToEmailError">Invalid email format</small>
+
+                  <div class="row mt-2">
+                    <div class="col">
+                      <label class="form-label">Tel. number</label>
+                      <input type="text" class="form-control form-control-sm" name="ship_to_telephone_number">
+                    </div>
+                    <div class="col">
+                      <label class="form-label">Fax</label>
+                      <input type="text" class="form-control form-control-sm" name="ship_to_fax_number">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+              <!-- Payment Options and Additional Info -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-credit-card me-1"></i>Payment Options</h6>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="tax_exempt" id="taxExempt">
+                    <label class="form-check-label" for="taxExempt">Tax Exempt</label>
+                  </div>
+                  <!-- Dynamic Tax Fields Container -->
+                  <div id="taxFieldsContainer">
+                    <!-- Tax fields will be dynamically populated here -->
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col">
+                      <label class="form-label">Discount %</label>
+                      <input type="number" step="0.01" class="form-control form-control-sm" name="discount_percent" value="0">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-info-circle me-1"></i>Additional Info</h6>
+                  <label class="form-label">Country</label>
+                  <select class="form-select form-select-sm" name="country" required>
+                    <option value="">Select Country</option>
+                    <option value="ANTARCTICA">ANTARCTICA</option>
+                    <option value="USA">USA</option>
+                    <option value="CANADA">CANADA</option>
+                    <option value="INDIA">INDIA</option>
+                    <option value="UK">UK</option>
+                  </select>
+                  <label class="form-label mt-2">City</label>
+                  <input type="text" class="form-control form-control-sm" name="city" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customer Type and Notes -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-user-tag me-1"></i>Customer Type</h6>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="customer_type" value="client" checked>
+                    <label class="form-check-label">Client</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="customer_type" value="vendor">
+                    <label class="form-check-label">Vendor</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="customer_type" value="both">
+                    <label class="form-check-label">Both (Client/Vendor)</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-sticky-note me-1"></i>Notes</h6>
+                  <textarea class="form-control form-control-sm" rows="4" name="notes"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning text-light" onclick="saveCustomer()">
+          <i class="fas fa-check me-2"></i><span id="saveButtonText">Save Customer</span>
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Edit Customer Modal -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #FFAA17; color: #212529; border-bottom: 1px solid #ffb302;">
+        <h5 class="modal-title text-light">
+          <i class="fas fa-user-edit me-2"></i> Edit Customer
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editCustomerForm" enctype="multipart/form-data" method="post" action="">
+          {% csrf_token %}
+          <input type="hidden" name="customer_id_hidden" id="editCustomerId">
+          <div class="container-fluid">
+            <!-- Customer ID, Category, Status -->
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="form-label">Customer ID</label>
+                <input type="text" class="form-control form-control-sm" name="customer_id" id="editCustomerIdField" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Category</label>
+                <div class="position-relative">
+                  <input type="text" class="form-control form-control-sm" 
+                         id="editCategoryInput" 
+                         name="category_name" 
+                         placeholder="Enter category"
+                         autocomplete="off"
+                         onclick="toggleEditCategoryDropdown()"
+                         oninput="filterEditCategories(this.value)"
+                         required>
+                  <input type="hidden" name="customer_category" id="editCategoryId">
+                  <div class="dropdown-menu w-100" id="editCategoryDropdown" style="display: none; max-height: 200px; overflow-y: auto;">
+                    {% for category in categories %}
+                    <div class="dropdown-item category-option" 
+                         data-id="{{ category.id }}" 
+                         data-name="{{ category.category }}"
+                         onclick="selectEditCategory({{ category.id }}, '{{ category.category }}')">
+                      {{ category.category }}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label d-block">Status</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="status" value="Active" id="editStatusActive">
+                  <label class="form-check-label" for="editStatusActive">Active</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Invoice and Ship To sections -->
+            <div class="row mb-3 align-items-center">
+              <div class="col-md-5">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-file-invoice me-1"></i>Invoice to (appears on invoices)</h6>
+                  <label class="form-label">Business name</label>
+                  <input type="text" class="form-control form-control-sm" name="business_name" id="editBusinessName" required>
+                  <label class="form-label mt-2">Address</label>
+                  <textarea class="form-control form-control-sm" name="address" id="editAddress" rows="3" required></textarea>
+                </div>
+              </div>
+              <div class="col-md-2 text-center">
+                <input type="checkbox" class="form-check-input mb-1" id="editSameAsInvoice" onchange="copyEditInvoiceToShip()">
+                <label for="editSameAsInvoice" class="form-check-label">Same as Invoice</label>
+              </div>
+              <div class="col-md-5">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-shipping-fast me-1"></i>Ship to (appears on invoices)</h6>
+                  <label class="form-label">Ship to name</label>
+                  <input type="text" class="form-control form-control-sm" name="ship_to_name" id="editShipToName">
+                  <label class="form-label mt-2">Address</label>
+                  <textarea class="form-control form-control-sm" name="shipping_address" id="editShippingAddress" rows="3"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact sections -->
+            <div class="row mb-3 align-items-center">
+              <div class="col-md-5">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-user me-1"></i>Contact</h6>
+                  <label class="form-label">Contact person</label>
+                  <input type="text" class="form-control form-control-sm" name="contact_person" id="editContactPerson" required>
+                  <label class="form-label mt-2">E-mail address</label>
+                  <input type="email" class="form-control form-control-sm" name="email_address" id="editEmailAddress" required>
+                  <small class="text-danger d-none" id="editEmailError">Invalid email format</small>
+
+                  <div class="row mt-2">
+                    <div class="col">
+                      <label class="form-label">Tel. number</label>
+                      <input type="text" class="form-control form-control-sm" name="telephone_number" id="editTelephoneNumber" required>
+                    </div>
+                    <div class="col">
+                      <label class="form-label">Fax</label>
+                      <input type="text" class="form-control form-control-sm" name="fax_number" id="editFaxNumber">
+                    </div>
+                  </div>
+                  <label class="form-label mt-2">Mobile number for SMS</label>
+                  <input type="text" class="form-control form-control-sm" name="sms_mobile_number" id="editSmsMobileNumber">
+                  <small class="text-danger d-none" id="editMobileError">Phone number must be 10 digits</small>
+                </div>
+              </div>
+              <div class="col-md-2 text-center">
+                <input type="checkbox" class="form-check-input mb-1" id="editSameAsContact" onchange="copyEditContactToShip()">
+                <label for="editSameAsContact" class="form-check-label">Same as Contact</label>
+              </div>
+              <div class="col-md-5">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-user me-1"></i>Ship To Contact</h6>
+                  <label class="form-label">Contact person</label>
+                  <input type="text" class="form-control form-control-sm" name="ship_to_contact_person" id="editShipToContactPerson">
+                  <label class="form-label mt-2">E-mail address</label>
+                  <input type="email" class="form-control form-control-sm" name="ship_to_email_address" id="editShipToEmail">
+                  <small class="text-danger d-none" id="editShipToEmailError">Invalid email format</small>
+
+                  <div class="row mt-2">
+                    <div class="col">
+                      <label class="form-label">Tel. number</label>
+                      <input type="text" class="form-control form-control-sm" name="ship_to_telephone_number" id="editShipToTelephoneNumber">
+                    </div>
+                    <div class="col">
+                      <label class="form-label">Fax</label>
+                      <input type="text" class="form-control form-control-sm" name="ship_to_fax_number" id="editShipToFaxNumber">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Options and Additional Info -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-credit-card me-1"></i>Payment Options</h6>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="tax_exempt" id="editTaxExempt">
+                    <label class="form-check-label" for="editTaxExempt">Tax Exempt</label>
+                  </div>
+                  <!-- Dynamic Tax Fields Container -->
+                  <div id="editTaxFieldsContainer">
+                    <!-- Tax fields will be dynamically populated here -->
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col">
+                      <label class="form-label">Discount %</label>
+                      <input type="number" step="0.01" class="form-control form-control-sm" name="discount_percent" id="editDiscountPercent" value="0">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-info-circle me-1"></i>Additional Info</h6>
+                  <label class="form-label">Country</label>
+                  <select class="form-select form-select-sm" name="country" id="editCountry" required>
+                    <option value="">Select Country</option>
+                    <option value="ANTARCTICA">ANTARCTICA</option>
+                    <option value="USA">USA</option>
+                    <option value="CANADA">CANADA</option>
+                    <option value="INDIA">INDIA</option>
+                    <option value="UK">UK</option>
+                  </select>
+                  <label class="form-label mt-2">City</label>
+                  <input type="text" class="form-control form-control-sm" name="city" id="editCity" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customer Type and Notes -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-user-tag me-1"></i>Customer Type</h6>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="customer_type" value="client" id="editCustomerTypeClient">
+                    <label class="form-check-label">Client</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="customer_type" value="vendor" id="editCustomerTypeVendor">
+                    <label class="form-check-label">Vendor</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="customer_type" value="both" id="editCustomerTypeBoth">
+                    <label class="form-check-label">Both (Client/Vendor)</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="border p-2 bg-light rounded">
+                  <h6 class="text-primary"><i class="fas fa-sticky-note me-1"></i>Notes</h6>
+                  <textarea class="form-control form-control-sm" rows="4" name="notes" id="editNotes"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning text-light" onclick="updateCustomer()">
+          <i class="fas fa-check me-2 text-light"></i>Update Customer
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  function validatePhone(phone) {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phone);
+  }
+
+  // Real-time validation
+  document.addEventListener("DOMContentLoaded", function () {
+    const emailField = document.getElementById("editEmailAddress");
+    const emailError = document.getElementById("editEmailError");
+
+    const mobileField = document.getElementById("editSmsMobileNumber");
+    const mobileError = document.getElementById("editMobileError");
+
+    const shipToEmailField = document.getElementById("editShipToEmail");
+    const shipToEmailError = document.getElementById("editShipToEmailError");
+
+    // Contact email validation
+    emailField.addEventListener("input", function () {
+      if (!validateEmail(emailField.value.trim())) {
+        emailError.classList.remove("d-none");
+      } else {
+        emailError.classList.add("d-none");
+      }
+    });
+
+    // Contact mobile validation
+    mobileField.addEventListener("input", function () {
+      if (!validatePhone(mobileField.value.trim())) {
+        mobileError.classList.remove("d-none");
+      } else {
+        mobileError.classList.add("d-none");
+      }
+    });
+
+    // Ship to email validation
+    shipToEmailField.addEventListener("input", function () {
+      if (!validateEmail(shipToEmailField.value.trim())) {
+        shipToEmailError.classList.remove("d-none");
+      } else {
+        shipToEmailError.classList.add("d-none");
+      }
+    });
+  });
+</script>
+
+<script>
+// Function to load tax settings for edit modal
+function loadEditTaxSettings() {
+  fetch('/get_tax_settings/')
+    .then(response => response.json())
+    .then(data => {
+      const editTaxFieldsContainer = document.getElementById('editTaxFieldsContainer');
+      
+      if (data.tax_type === 'no') {
+        // No tax - hide all tax fields
+        editTaxFieldsContainer.innerHTML = '';
+      } else if (data.tax_type === 'one') {
+        // One level of tax - show only tax1 field
+        editTaxFieldsContainer.innerHTML = `
+          <div class="row">
+            <div class="col">
+              <label class="form-label">Specific Tax 1 %</label>
+              <input type="number" step="0.01" class="form-control form-control-sm" name="specific_tax1_percent" id="editSpecificTax1Percent" value="0">
+            </div>
+          </div>
+        `;
+      } else if (data.tax_type === 'two') {
+        // Two levels of tax - show both tax fields
+        editTaxFieldsContainer.innerHTML = `
+          <div class="row">
+            <div class="col">
+              <label class="form-label">Specific Tax 1 %</label>
+              <input type="number" step="0.01" class="form-control form-control-sm" name="specific_tax1_percent" id="editSpecificTax1Percent" value="0">
+            </div>
+            <div class="col">
+              <label class="form-label">Specific Tax 2 %</label>
+              <input type="number" step="0.01" class="form-control form-control-sm" name="specific_tax2_percent" id="editSpecificTax2Percent" value="0">
+            </div>
+          </div>
+        `;
+      }
+    })
+    .catch(error => {
+      console.error('Error loading tax settings:', error);
+    });
+}
+
+// Function to handle edit customer
+function editCustomer() {
+    // Get selected customer checkboxes
+    const selectedCheckboxes = document.querySelectorAll('input[name="customer_select"]:checked');
+    
+    if (selectedCheckboxes.length === 0) {
+        // Show JavaScript popup instead of modal
+        alert('Please select a customer first to edit.');
+        return;
+    }
+    
+    if (selectedCheckboxes.length > 1) {
+        alert('Please select only one customer to edit.');
+        return;
+    }
+    
+    // Get the selected customer ID
+    const customerId = selectedCheckboxes[0].value;
+    
+    // Load tax settings first, then fetch customer data
+    loadEditTaxSettings();
+    
+    // Add a small delay to ensure tax fields are loaded before populating data
+    setTimeout(() => {
+        fetchCustomerData(customerId);
+    }, 100);
+}
+
+// Function to fetch customer data via AJAX
+function fetchCustomerData(customerId) {
+    fetch(`/get_customer/${customerId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateEditModal(data.customer);
+                // Show the edit modal
+                const editModal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
+                editModal.show();
+            } else {
+                alert('Error fetching customer data: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error fetching customer data');
+        });
+}
+
+// Function to populate edit modal with customer data
+function populateEditModal(customer) {
+    document.getElementById('editCustomerId').value = customer.id;
+    document.getElementById('editCustomerIdField').value = customer.customer_id;
+    document.getElementById('editCategoryInput').value = customer.category_name;
+    document.getElementById('editCategoryId').value = customer.category_id;
+    document.getElementById('editStatusActive').checked = customer.status === 'Active';
+    
+    document.getElementById('editBusinessName').value = customer.business_name;
+    document.getElementById('editAddress').value = customer.address;
+    document.getElementById('editShipToName').value = customer.ship_to_name || '';
+    document.getElementById('editShippingAddress').value = customer.shipping_address || '';
+    
+    document.getElementById('editContactPerson').value = customer.contact_person;
+    document.getElementById('editEmailAddress').value = customer.email_address;
+    document.getElementById('editTelephoneNumber').value = customer.telephone_number;
+    document.getElementById('editFaxNumber').value = customer.fax_number || '';
+    document.getElementById('editSmsMobileNumber').value = customer.sms_mobile_number || '';
+    
+    document.getElementById('editShipToContactPerson').value = customer.ship_to_contact_person || '';
+    document.getElementById('editShipToEmail').value = customer.ship_to_email_address || '';
+    document.getElementById('editShipToTelephoneNumber').value = customer.ship_to_telephone_number || '';
+    document.getElementById('editShipToFaxNumber').value = customer.ship_to_fax_number || '';
+    
+    document.getElementById('editTaxExempt').checked = customer.tax_exempt;
+    document.getElementById('editDiscountPercent').value = customer.discount_percent;
+    document.getElementById('editCountry').value = customer.country;
+    document.getElementById('editCity').value = customer.city;
+    document.getElementById('editNotes').value = customer.notes || '';
+    
+    // Populate tax fields if they exist
+    const editTax1Field = document.getElementById('editSpecificTax1Percent');
+    const editTax2Field = document.getElementById('editSpecificTax2Percent');
+    
+    if (editTax1Field) {
+        editTax1Field.value = customer.specific_tax1_percent || 0;
+    }
+    if (editTax2Field) {
+        editTax2Field.value = customer.specific_tax2_percent || 0;
+    }
+    
+    // Set customer type radio buttons
+    document.getElementById('editCustomerTypeClient').checked = customer.customer_type === 'client';
+    document.getElementById('editCustomerTypeVendor').checked = customer.customer_type === 'vendor';
+    document.getElementById('editCustomerTypeBoth').checked = customer.customer_type === 'both';
+    
+    // Set form action
+    document.getElementById('editCustomerForm').action = `/edit_customer/${customer.id}/`;
+}
+
+// Function to update customer
+function updateCustomer() {
+    const form = document.getElementById('editCustomerForm');
+    const formData = new FormData(form);
+    
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Customer updated successfully!');
+            location.reload(); // Refresh the page
+        } else {
+            alert('Error updating customer: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating customer');
+    });
+}
+
+// Helper functions for edit modal dropdowns
+function toggleEditCategoryDropdown() {
+    const dropdown = document.getElementById('editCategoryDropdown');
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+}
+
+function filterEditCategories(value) {
+    const dropdown = document.getElementById('editCategoryDropdown');
+    const options = dropdown.querySelectorAll('.category-option');
+    
+    dropdown.style.display = 'block';
+    
+    options.forEach(option => {
+        const categoryName = option.getAttribute('data-name').toLowerCase();
+        if (categoryName.includes(value.toLowerCase())) {
+            option.style.display = 'block';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+}
+
+function selectEditCategory(id, name) {
+    document.getElementById('editCategoryInput').value = name;
+    document.getElementById('editCategoryId').value = id;
+    document.getElementById('editCategoryDropdown').style.display = 'none';
+}
+
+function copyEditInvoiceToShip() {
+    const checkbox = document.getElementById('editSameAsInvoice');
+    if (checkbox.checked) {
+        document.getElementById('editShipToName').value = document.getElementById('editBusinessName').value;
+        document.getElementById('editShippingAddress').value = document.getElementById('editAddress').value;
+    }
+}
+
+function copyEditContactToShip() {
+    const checkbox = document.getElementById('editSameAsContact');
+    if (checkbox.checked) {
+        document.getElementById('editShipToContactPerson').value = document.getElementById('editContactPerson').value;
+        document.getElementById('editShipToEmail').value = document.getElementById('editEmailAddress').value;
+        document.getElementById('editShipToTelephoneNumber').value = document.getElementById('editTelephoneNumber').value;
+        document.getElementById('editShipToFaxNumber').value = document.getElementById('editFaxNumber').value;
+    }
+}
+
+
+function toggleSelectAll() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const customerCheckboxes = document.querySelectorAll('.customer-checkbox');
+    
+    customerCheckboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+}
+
+
+document.addEventListener('click', function(event) {
+    const categoryDropdown = document.getElementById('editCategoryDropdown');
+    const categoryInput = document.getElementById('editCategoryInput');
+    
+    if (categoryInput && categoryDropdown && !categoryInput.contains(event.target) && !categoryDropdown.contains(event.target)) {
+        categoryDropdown.style.display = 'none';
+    }
+});
+
+
+function loadTaxSettings() {
+  fetch('/get_tax_settings/')
+    .then(response => response.json())
+    .then(data => {
+      const taxFieldsContainer = document.getElementById('taxFieldsContainer');
+      
+      if (data.tax_type === 'no') {
+       
+        taxFieldsContainer.innerHTML = '';
+      } else if (data.tax_type === 'one') {
+       
+        taxFieldsContainer.innerHTML = `
+          <div class="row">
+            <div class="col">
+              <label class="form-label">Specific Tax 1 %</label>
+              <input type="number" step="0.01" class="form-control form-control-sm" name="specific_tax1_percent" value="0">
+            </div>
+          </div>
+        `;
+      } else if (data.tax_type === 'two') {
+        
+        taxFieldsContainer.innerHTML = `
+          <div class="row">
+            <div class="col">
+              <label class="form-label">Specific Tax 1 %</label>
+              <input type="number" step="0.01" class="form-control form-control-sm" name="specific_tax1_percent" value="0">
+            </div>
+            <div class="col">
+              <label class="form-label">Specific Tax 2 %</label>
+              <input type="number" step="0.01" class="form-control form-control-sm" name="specific_tax2_percent" value="0">
+            </div>
+          </div>
+        `;
+      }
+    })
+    .catch(error => {
+      console.error('Error loading tax settings:', error);
+    });
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const emailInput = document.getElementById("emailAddress");
+  const emailError = document.getElementById("emailError");
+
+  const mobileInput = document.getElementById("smsMobileNumber");
+  const mobileError = document.getElementById("mobileError");
+
+  const shipToEmailInput = document.getElementById("shipToEmail");
+  const shipToEmailError = document.getElementById("shipToEmailError");
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const mobileRegex = /^\d{10}$/;
+
+
+  emailInput.addEventListener("input", function () {
+    if (!emailRegex.test(emailInput.value.trim())) {
+      emailError.classList.remove("d-none");
+    } else {
+      emailError.classList.add("d-none");
+    }
+  });
+
+ 
+  shipToEmailInput.addEventListener("input", function () {
+    if (!emailRegex.test(shipToEmailInput.value.trim())) {
+      shipToEmailError.classList.remove("d-none");
+    } else {
+      shipToEmailError.classList.add("d-none");
+    }
+  });
+
+ 
+  mobileInput.addEventListener("input", function () {
+    if (!mobileRegex.test(mobileInput.value.trim())) {
+      mobileError.classList.remove("d-none");
+    } else {
+      mobileError.classList.add("d-none");
+    }
+  });
+});
+</script>
+
+<script>
+
+function loadTaxSettings() {
+  fetch('/get_tax_settings/')
+    .then(response => response.json())
+    .then(data => {
+      const taxFieldsContainer = document.getElementById('taxFieldsContainer');
+      
+      if (data.tax_type === 'no') {
+       
+        taxFieldsContainer.innerHTML = '';
+      } else if (data.tax_type === 'one') {
+     
+        taxFieldsContainer.innerHTML = `
+          <div class="row">
+            <div class="col">
+              <label class="form-label">Specific Tax 1 %</label>
+              <input type="number" step="0.01" class="form-control form-control-sm" name="specific_tax1_percent" value="0">
+            </div>
+          </div>
+        `;
+      } else if (data.tax_type === 'two') {
+        // Two levels of tax - show both tax fields
+        taxFieldsContainer.innerHTML = `
+          <div class="row">
+            <div class="col">
+              <label class="form-label">Specific Tax 1 %</label>
+              <input type="number" step="0.01" class="form-control form-control-sm" name="specific_tax1_percent" value="0">
+            </div>
+            <div class="col">
+              <label class="form-label">Specific Tax 2 %</label>
+              <input type="number" step="0.01" class="form-control form-control-sm" name="specific_tax2_percent" value="0">
+            </div>
+          </div>
+        `;
+      }
+    })
+    .catch(error => {
+      console.error('Error loading tax settings:', error);
+    });
+}
+
+</script>
+
+<script>
+
+
+function toggleCategoryDropdown() {
+  const dropdown = document.getElementById('categoryDropdown');
+  const input = document.getElementById('categoryInput');
+  
+  if (dropdown.style.display === 'none') {
+    dropdown.style.display = 'block';
+    dropdown.classList.add('show');
+    input.focus();
+  } else {
+    dropdown.style.display = 'none';
+    dropdown.classList.remove('show');
+  }
+}
+
+
+function filterCategories(searchTerm) {
+  const categoryOptions = document.querySelectorAll('.category-option');
+  const dropdown = document.getElementById('categoryDropdown');
+  
+
+  if (dropdown.style.display === 'none') {
+    dropdown.style.display = 'block';
+    dropdown.classList.add('show');
+  }
+  
+  categoryOptions.forEach(option => {
+    const categoryName = option.textContent.toLowerCase();
+    if (categoryName.includes(searchTerm.toLowerCase())) {
+      option.style.display = 'block';
+    } else {
+      option.style.display = 'none';
+    }
+  });
+}
+
+
+function selectCategory(categoryId, categoryName) {
+  const input = document.getElementById('categoryInput');
+  const hiddenInput = document.getElementById('categoryId');
+  const dropdown = document.getElementById('categoryDropdown');
+  
+  input.value = categoryName;
+  hiddenInput.value = categoryId;
+  dropdown.style.display = 'none';
+  dropdown.classList.remove('show');
+}
+
+function saveCustomer() {
+  const customerForm = document.getElementById('addCustomerForm');
+  const saveButton = document.querySelector('#addCustomerModal .btn-warning');
+  const saveButtonText = document.getElementById('saveButtonText');
+  const categoryInput = document.getElementById('categoryInput');
+  const categoryId = document.getElementById('categoryId');
+  
+ 
+  if (!categoryId.value && categoryInput.value.trim()) {
+  
+  } else if (!categoryId.value && !categoryInput.value.trim()) {
+    alert('Please select or enter a category.');
+    return;
+  }
+  
+
+  if (!customerForm.checkValidity()) {
+    customerForm.reportValidity();
+    return;
+  }
+  
+
+  const originalText = saveButtonText.textContent;
+  saveButtonText.textContent = 'Saving...';
+  saveButton.disabled = true;
+  
+ 
+  const formData = new FormData(customerForm);
+  
+
+  fetch(customerForm.action, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+   
+      alert('Customer saved successfully!');
+      location.reload(); 
+    } else {
+      throw new Error('Network response was not ok');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error saving customer. Please try again.');
+  })
+  .finally(() => {
+    // Reset button state
+    saveButtonText.textContent = originalText;
+    saveButton.disabled = false;
+  });
+}
+function copyInvoiceToShip() {
+  const checkbox = document.getElementById('sameAsInvoice');
+  const shipToName = document.querySelector('input[name="ship_to_name"]');
+  const shippingAddress = document.querySelector('textarea[name="shipping_address"]');
+  const businessName = document.querySelector('input[name="business_name"]').value;
+  const address = document.querySelector('textarea[name="address"]').value;
+
+  if (checkbox.checked) {
+    shipToName.value = businessName;
+    shippingAddress.value = address;
+
+    shipToName.readOnly = true;
+    shippingAddress.readOnly = true;
+  } else {
+    shipToName.value = '';
+    shippingAddress.value = '';
+
+    shipToName.readOnly = false;
+    shippingAddress.readOnly = false;
+  }
+}
+
+function copyContactToShip() {
+  const checkbox = document.getElementById('sameAsContact');
+
+  const contactPerson = document.querySelector('input[name="contact_person"]').value;
+  const email = document.querySelector('input[name="email_address"]').value;
+  const telephone = document.querySelector('input[name="telephone_number"]').value;
+  const fax = document.querySelector('input[name="fax_number"]').value;
+
+  const shipToContactPerson = document.querySelector('input[name="ship_to_contact_person"]');
+  const shipToEmail = document.querySelector('input[name="ship_to_email_address"]');
+  const shipToTelephone = document.querySelector('input[name="ship_to_telephone_number"]');
+  const shipToFax = document.querySelector('input[name="ship_to_fax_number"]');
+
+  if (checkbox.checked) {
+    shipToContactPerson.value = contactPerson;
+    shipToEmail.value = email;
+    shipToTelephone.value = telephone;
+    shipToFax.value = fax;
+
+    shipToContactPerson.readOnly = true;
+    shipToEmail.readOnly = true;
+    shipToTelephone.readOnly = true;
+    shipToFax.readOnly = true;
+  } else {
+    shipToContactPerson.value = '';
+    shipToEmail.value = '';
+    shipToTelephone.value = '';
+    shipToFax.value = '';
+
+    shipToContactPerson.readOnly = false;
+    shipToEmail.readOnly = false;
+    shipToTelephone.readOnly = false;
+    shipToFax.readOnly = false;
+  }
+}
+
+
+document.addEventListener('click', function(event) {
+  const categoryInput = document.getElementById('categoryInput');
+  const dropdown = document.getElementById('categoryDropdown');
+  
+  if (!categoryInput.contains(event.target) && !dropdown.contains(event.target)) {
+    dropdown.style.display = 'none';
+    dropdown.classList.remove('show');
+  }
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  const addCustomerModal = document.getElementById('addCustomerModal');
+  
+  if (addCustomerModal) {
+    addCustomerModal.addEventListener('show.bs.modal', function() {
+      loadTaxSettings();
+    });
+  }
+});
+</script>
+
+
+<script>
+function showTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    
+   
+    tabcontent = document.getElementsByClassName("tab-pane");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].classList.remove("active");
+    }
+    
+   
+    tablinks = document.getElementsByClassName("tab-button");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+    }
+    
+  
+    document.getElementById(tabName).classList.add("active");
+    evt.currentTarget.classList.add("active");
+}
+
+function toggleSelectAll() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const customerCheckboxes = document.querySelectorAll('.customer-checkbox');
+    
+    customerCheckboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+}
+</script>
+<script>
+function getSelectedCustomerID() {
+    const selected = document.querySelector('input[name="customer_select"]:checked');
+    if (!selected) {
+        alert("Please select a customer to print invoices.");
+        return null;
+    }
+    const customerRow = selected.closest('tr');
+    const customerID = customerRow.querySelector('.customer-id').innerText.trim();
+    return customerID;
+}
+
+function printSelectedCustomerInvoices() {
+    const customerID = getSelectedCustomerID();
+    if (!customerID) return;
+
+    
+    const url = `{% url 'preview_invoice' %}?customer_id=` + encodeURIComponent(customerID);
+    const printWindow = window.open(url, '_blank');
+
+   
+    printWindow.onload = function () {
+        printWindow.print();
+    };
+}
+
+function submitPreviewForm() {
+    const selectedCustomer = document.querySelector('input[name="customer_select"]:checked');
+    if (!selectedCustomer) {
+        alert("Please select a customer to preview invoices.");
+        return;
+    }
+
+    const customerRow = selectedCustomer.closest('tr');
+    const customerID = customerRow.querySelector('.customer-id').innerText.trim();
+
+    document.getElementById('previewCustomerID').value = customerID;
+    document.getElementById('invoicePreviewForm').submit();
+}
+</script>
+
+<script>
+function deleteSelectedCustomers() {
+    const checkboxes = document.querySelectorAll('input[name="customer_select"]:checked');
+    
+    if (checkboxes.length === 0) {
+        alert('Please select at least one customer to delete.');
+        return;
+    }
+
+    if (!confirm('Are you sure you want to delete the selected customer(s)? This action cannot be undone.')) {
+        return;
+    }
+
+    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+
+  
+    fetch("{% url 'delete_customers' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ customer_ids: selectedIds })
+    })
+    .then(response => {
+        if (response.ok) {
+            location.reload(); 
+        } else {
+            alert('Something went wrong. Please try again.');
+        }
+    });
+}
+</script>
+<script>
+    function refreshCustomerList() {
+        
+        window.location.href = window.location.pathname;
+    }
+</script>
+<script>
+function exportCustomerToExcel() {
+    // Create a hidden link to trigger download
+    const link = document.createElement('a');
+    link.href = "{% url 'export_customers_excel' %}";
+    link.download = 'customers.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const addCustomerBtn = document.getElementById('addCustomerBtn');
+
+    // Set permission from server (passed from context)
+    const userCanCreateCustomer = {{ user_permissions.create_customer|yesno:"true,false" }};
+
+    if (!userCanCreateCustomer) {
+      // Disable modal trigger
+      addCustomerBtn.removeAttribute('data-bs-toggle');
+      addCustomerBtn.removeAttribute('data-bs-target');
+
+      // Show alert on click
+      addCustomerBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        alert("You don't have permission to add a customer.");
+      });
+    }
+  });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const deleteBtn = document.getElementById('deleteSelectedBtn');
+
+  const userCanDeleteCustomer = {{ user_permissions.delete_customer|yesno:"true,false" }};
+
+  if (!userCanDeleteCustomer) {
+    // Override the onclick behavior to show an alert
+    deleteBtn.onclick = function (e) {
+      e.preventDefault();
+      alert("You don't have permission to delete a customer.");
+    };
+  }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const importBtn = document.getElementById('importCustomerBtn');
+
+  const userCanImportCustomer = {{ user_permissions.import_customers|yesno:"true,false" }};
+
+  if (!userCanImportCustomer) {
+    // Remove Bootstrap modal trigger attributes
+    importBtn.removeAttribute('data-bs-toggle');
+    importBtn.removeAttribute('data-bs-target');
+
+    // Show native alert when clicked
+    importBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      alert("You don't have permission to import customers.");
+    });
+  }
+});
+</script>
+
+{% endblock %}

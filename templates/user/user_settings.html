@@ -1,0 +1,749 @@
+{% extends 'user/user_dashboard.html' %}
+{% block content %}
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  body {
+    padding-top: 70px;
+    background-color: #f8f9fa;
+  }
+
+  .navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .panel {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .user-list li {
+    cursor: pointer;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .user-list li:last-child {
+    border-bottom: none;
+  }
+
+  .user-list li.active-user,
+  .user-list li:hover {
+    background-color: #e9ecef;
+  }
+
+  .user-list-scroll {
+    max-height: 300px; 
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+
+  @media (max-width: 1024px) {
+    .top-buttons {
+      margin-top: 50px !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .top-buttons {
+      margin-top: 0 !important;
+    }
+  }
+
+  .custom-btn {
+    width: 110px;
+    height: 100px;
+    padding: 12px 8px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+    word-wrap: break-word;
+  }
+
+  .settings-scroll-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 5px;
+  }
+
+  .settings-scroll-container::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .settings-scroll-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+  }
+
+  .settings-scroll-container .btn {
+    min-width: 150px;
+    text-align: center;
+    white-space: normal;
+    margin-right: 2px;
+    border-radius: 0;
+    border: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    color: #495057;
+    transition: 0.2s ease-in-out;
+  }
+
+  /* .settings-scroll-container .btn.active-setting {
+    background-color: #FFAA17;
+    color: white;
+    font-weight: 500;
+    z-index: 1;
+  }
+ */
+  .card {
+    border-radius: 10px;
+    background-color: #fff;
+    margin-bottom: 50px;
+  }
+  .modal-backdrop {
+  opacity: 0.2 !important; 
+}
+
+</style>
+
+
+<div class="container">
+  <div class="d-flex justify-content-start mb-3 top-buttons gap-2">
+     <a href="#" class="btn btn-outline-primary custom-btn text-center" data-bs-toggle="modal" data-bs-target="#quickWizardModal">
+  <i class="fas fa-play fa-lg mb-1"></i><br>
+  Quick Start<br>Wizard
+</a>
+
+    <a href="#" class="btn btn-outline-primary custom-btn text-center">
+      <i class="fas fa-book fa-lg mb-1"></i><br>
+      Online<br>User Manual
+    </a>
+    <a href="#" class="btn btn-outline-primary custom-btn text-center">
+      <i class="fas fa-circle-up fa-lg mb-1"></i><br>
+      Upgrade to<br>PRO Now
+    </a>
+  </div>
+
+  <div class="card shadow-sm p-3">
+    <div class="settings-scroll-container mb-3 border-bottom pb-2">
+      <div class="d-flex flex-nowrap gap-1" id="settingTabs">
+        <a href="{% url 'user_miscellaneous_settings' %}" class="btn btn-light flex-shrink-0">Miscellaneous</a>
+        <button class="btn flex-shrink-0" onclick="showSection(this, 'company')">Company Settings</button>
+        <a href="{% url 'user_invoice_settings' %}?section=invoice" class="btn btn-light flex-shrink-0">Invoice Settings</a>
+        <a href="{% url 'user_order_settings' %}?section=order" class="btn btn-light flex-shrink-0">Order Settings</a>
+        <a href="{% url 'user_estimate_settings' %}?section=estimate" class="btn btn-light flex-shrink-0">Estimate Settings</a>
+        <a href="{% url 'user_advanced_settings' %}" class="btn btn-light flex-shrink-0">Advanced Settings</a>
+          <a href="{% url 'user_email_templates' %}" class="btn btn-light flex-shrink-0">Email Templates</a>
+          <a href="{% url 'user_payment_settings_view' %}" class="btn btn-light flex-shrink-0">payments</a>
+        <a href="{% url 'user_purchase_order' %}?section=purchase" class="btn btn-light flex-shrink-0">Purchase Order</a>
+      </div>
+    </div>
+
+<div id="settingsContent" class="mt-3">
+
+  <!-- Miscellaneous Settings -->
+  <div id="MiscSettingsContent" style="display: none;">
+    <p>Miscellaneous Settings</p>
+  </div>
+
+<form id="companySettingsForm" enctype="multipart/form-data" method="post"
+  action="{% if company.id %}{% url 'user_edit_company' company.id %}{% else %}{% url 'user_add_company' %}{% endif %}">
+  {% csrf_token %}
+  <div id="CompanySettingsContent" style="display: none;">
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <h5>Company Data</h5>
+
+        <div class="row mb-3 align-items-center">
+          <label for="companyName" class="col-4 col-form-label text-start">Company Name</label>
+          <div class="col-8">
+            <input type="text" name="company_name" id="companyName" class="form-control" required value="{{ company.company_name|default:'' }}">
+          </div>
+        </div>
+
+        <div class="row mb-3 align-items-center">
+          <label for="companyAddress" class="col-4 col-form-label text-start">Address</label>
+          <div class="col-8">
+            <textarea name="company_address" id="companyAddress" rows="2" class="form-control" required>{{ company.address|default:'' }}</textarea>
+          </div>
+        </div>
+
+        <div class="row mb-3 align-items-center">
+          <label for="companyEmail" class="col-4 col-form-label text-start">Email</label>
+          <div class="col-8">
+            <input type="email" name="company_email" id="companyEmail" class="form-control" required value="{{ company.email|default:'' }}">
+          </div>
+        </div>
+
+        <div class="row mb-3 align-items-center">
+          <label for="salesTax" class="col-4 col-form-label text-start">Sales Tax Reg. No.</label>
+          <div class="col-8">
+            <input type="text" name="sales_tax" id="salesTax" class="form-control" required value="{{ company.sales_tax_reg_no|default:'' }}">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <h5>Select Tax Type</h5>
+
+        <div class="row">
+          <div class="col-md-6 col-sm-12">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="taxType" id="noTax" value="no" {% if tax.tax_type_first == 'no' %}checked{% endif %}>
+              <label class="form-check-label" for="noTax">Do not use tax</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="taxType" id="oneTax" value="one" {% if tax.tax_type_first == 'one' %}checked{% endif %}>
+              <label class="form-check-label" for="oneTax">1 Level of Tax</label>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="radio" name="taxType" id="twoTax" value="two" {% if tax.tax_type_first == 'two' %}checked{% endif %}>
+              <label class="form-check-label" for="twoTax">2 Levels of Tax</label>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-sm-12">
+            <div id="taxInputs"></div>
+          </div>
+
+          <div class="row mt-3 d-none" id="extraTaxOptions">
+            <div class="col-md-6">
+              <div id="taxCheckboxes"></div>
+            </div>
+            <div class="col-md-6">
+              <div id="tax2Calculation"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-md-6 col-sm-12">
+        <h5>Currency Settings</h5>
+
+        <div class="row mb-2 align-items-center">
+          <label for="currency" class="col-4 col-form-label text-start">Currency</label>
+          <div class="col-8">
+           <select class="form-select" id="currency" name="currency_name" onchange="updateCurrencyExample()">
+              <option value="" disabled selected>Select</option>
+              {% for curr in currency_list %}
+                <option value="{{ curr }}" {% if currency.currency_name == curr %}selected{% endif %}>{{ curr }}</option>
+              {% endfor %}
+            </select>
+
+          </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+          <label for="currencySign" class="col-4 col-form-label text-start">Currency Sign</label>
+          <div class="col-8">
+            <select class="form-select" id="currencySign" name="currency_sign" required onchange="updateCurrencyExample()">
+              <option value="" disabled selected>Select</option>
+              {% for sign in currency_sign_list %}
+                <option value="{{ sign }}" {% if currency.currency_sign == sign %}selected{% endif %}>{{ sign }}</option>
+              {% endfor %}
+            </select>
+
+          </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+          <label for="currencySignplacement" class="col-4 col-form-label text-start">Currency Sign Placement</label>
+          <div class="col-8">
+            <select class="form-select" name="currency_sign_placement" id="currencySignplacement" onchange="updateCurrencyExample()">
+              <option value="" disabled selected>Select</option>
+              {% for placement in placement_list %}
+                <option value="{{ placement }}" {% if currency.currency_sign_placement == placement %}selected{% endif %}>
+                  {{ placement }}
+                </option>
+              {% endfor %}
+            </select>
+
+          </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+          <label for="decimalSep" class="col-4 col-form-label text-start">Decimal Separator</label>
+          <div class="col-8">
+            <select class="form-select" id="decimalSep" name="decimal_separator" required onchange="updateCurrencyExample()">
+              <option value="." {% if currency.decimal_separator == '.' %}selected{% endif %}>.</option>
+              <option value="," {% if currency.decimal_separator == ',' %}selected{% endif %}>,</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3 align-items-center">
+          <label class="col-4 col-form-label text-start">Example</label>
+          <div class="col-8">
+            <input type="text" class="form-control" id="currencyExample" readonly value="$1,000.00">
+          </div>
+        </div>
+
+         <h5>Date Format</h5>
+  <div class="row mb-3 align-items-center">
+    <label for="dateFormat" class="col-4 col-form-label text-start">Date Format</label>
+    <div class="col-8">
+      <div class="input-group">
+        <select class="form-select me-2" id="dateFormat" name="date_format" onchange="updateDateExample()" required>
+          <option value="" selected disabled>Select</option>
+          {% for format in date_format_list %}
+        <option value="{{ format }}" {% if date_format.format == format %}selected{% endif %}>
+          {{ format }}
+        </option>
+      {% endfor %}
+        </select>
+        <input type="text" id="dateExample" class="form-control" readonly>
+      </div>
+    </div>
+  </div>
+      </div>
+
+      <div class="col-md-6 col-sm-12">
+        <h5 class="mt-4">Company Logo</h5>
+        <div class="mb-2">
+          {% if logo.image %}
+          <img id="logoPreview" src="{{ logo.image.url }}" alt="Logo Preview" class="img-thumbnail" style="max-height: 200px;">
+          {% else %}
+          <img id="logoPreview" src="" alt="Logo Preview" class="img-thumbnail" style="max-height: 200px; display: none;">
+          {% endif %}
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <input type="file" name="company_logo" id="logoInput" class="form-control form-control-sm" accept="image/*">
+          <div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" name="print_logo" id="printLogoCheckbox" {% if logo.print %}checked{% endif %}>
+            <label class="form-check-label" for="printLogoCheckbox">Print Logo on Invoice</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-12 text-end">
+        <button type="submit" class="btn px-4 py-2" style="background-color: #FFAA17;color: white;">Save Settings</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+
+  <!-- Other Settings Sections -->
+  <div id="InvoiceSettingsContent" style="display: none;">
+    <p>Invoice Settings</p>
+  </div>
+
+  <div id="OrderSettingsContent" style="display: none;">
+    <p>Order Settings</p>
+  </div>
+
+  <div id="EstimateSettingsContent" style="display: none;">
+    <p>Estimate Settings</p>
+  </div>
+
+
+
+  <div id="EmailSettingsContent" style="display: none;">
+    <p>Email Templates</p>
+  </div>
+
+  <div id="PaymentsSettingsContent" style="display: none;">
+    <p>Payments Settings</p>
+  </div>
+
+  <div id="PurchaseSettingsContent" style="display: none;">
+    <p>Purchase Order Settings</p>
+  </div>
+</div>
+
+</div>
+
+
+<!-- JS: Show Sections -->
+<script>
+  function showSection(button, section) {
+    document.querySelectorAll('#settingTabs .btn, #settingTabs a').forEach(tab => {
+      tab.classList.remove('active-setting');
+    });
+
+    if (button) {
+      button.classList.add('active-setting');
+    }
+
+    const allSections = [
+      'MiscSettingsContent',
+      'CompanySettingsContent',
+      'InvoiceSettingsContent',
+      'OrderSettingsContent',
+      'EstimateSettingsContent',
+      'AdvancedSettingsContent',
+      'EmailSettingsContent',
+      'PaymentsSettingsContent',
+      'PurchaseSettingsContent'
+    ];
+
+    allSections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+
+    const sectionId = section.charAt(0).toUpperCase() + section.slice(1) + 'SettingsContent';
+    const currentSection = document.getElementById(sectionId);
+    if (currentSection) {
+      currentSection.style.display = 'block';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash;
+
+    const tabMap = {
+      '#misc': { section: 'misc', selector: 'button[onclick*="misc"]' },
+      '#company': { section: 'company', selector: 'a[href*="#company"]' },
+      '#invoice': { section: 'invoice', selector: 'button[onclick*="invoice"]' },
+      '#order': { section: 'order', selector: 'button[onclick*="order"]' },
+      '#estimate': { section: 'estimate', selector: 'button[onclick*="estimate"]' },
+      '#email': { section: 'email', selector: 'button[onclick*="email"]' },
+      '#payments': { section: 'payments', selector: 'button[onclick*="payments"]' },
+      '#purchase': { section: 'purchase', selector: 'button[onclick*="purchase"]' },
+    };
+
+    if (hash && tabMap[hash]) {
+      const { section, selector } = tabMap[hash];
+      const tab = document.querySelector(`#settingTabs ${selector}`);
+      showSection(tab, section);
+      if (tab) {
+        tab.classList.add('active-setting');
+      }
+    } else {
+      const defaultBtn = document.querySelector('#settingTabs button[onclick*="misc"]');
+      showSection(defaultBtn, 'misc');
+      if (defaultBtn) {
+        defaultBtn.classList.add('active-setting');
+      }
+    }
+  });
+</script>
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const taxRadios = document.querySelectorAll('input[name="taxType"]');
+    const taxInputs = document.getElementById('taxInputs');
+    const extraRow = document.getElementById('extraTaxOptions');
+    const taxCheckboxes = document.getElementById('taxCheckboxes');
+    const tax2Calculation = document.getElementById('tax2Calculation');
+
+    const savedTaxType = "{{ tax.tax_type_first|default:''|escapejs }}";
+    const tax1Name = "{{ tax.tax1_name|default:''|escapejs }}";
+    const tax1Rate = "{{ tax.tax_rate|default:''|escapejs }}"; 
+    const tax2Name = "{{ tax.tax2_name|default:''|escapejs }}";
+    const tax2Rate = "{{ tax.tax2_rate|default:''|escapejs }}";
+    const printLevel1 = "{{ tax.print_tax1|yesno:'true,false'|escapejs }}"; 
+    const printLevel2 = "{{ tax.print_tax2|yesno:'true,false'|escapejs }}"; 
+    const tax2BasedOn = "{{ tax.tax_type_second|default:'total'|escapejs }}"; 
+
+    function updateTaxFields(value) {
+      taxInputs.innerHTML = '';
+      taxCheckboxes.innerHTML = '';
+      tax2Calculation.innerHTML = '';
+      extraRow.classList.add('d-none');
+
+      if (value === 'one') {
+        taxInputs.innerHTML = `
+          <div class="mb-2">
+            <label class="form-label">Tax Name</label>
+            <input type="text" class="form-control" name="tax1_name" value="${tax1Name}" placeholder="Enter tax name">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Tax Rate (%)</label>
+            <input type="number" class="form-control" name="tax1_rate" value="${tax1Rate}" placeholder="Enter tax rate">
+          </div>
+        `;
+
+        taxCheckboxes.innerHTML = `
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="printLevelOne" name="print_level_1" ${printLevel1 === "true" ? "checked" : ""}>
+            <label class="form-check-label" for="printLevelOne">Print Level One</label>
+          </div>
+        `;
+
+        extraRow.classList.remove('d-none');
+      }
+
+      else if (value === 'two') {
+        taxInputs.innerHTML = `
+          <div class="mb-2">
+            <label class="form-label">First Tax Name</label>
+            <input type="text" class="form-control" name="tax1_name" value="${tax1Name}" placeholder="Enter first tax name">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">First Tax Rate (%)</label>
+            <input type="number" class="form-control" name="tax1_rate" value="${tax1Rate}" placeholder="Enter first tax rate">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Second Tax Name</label>
+            <input type="text" class="form-control" name="tax2_name" value="${tax2Name}" placeholder="Enter second tax name">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Second Tax Rate (%)</label>
+            <input type="number" class="form-control" name="tax2_rate" value="${tax2Rate}" placeholder="Enter second tax rate">
+          </div>
+        `;
+
+        taxCheckboxes.innerHTML = `
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="printLevelOne" name="print_level_1" ${printLevel1 === "true" ? "checked" : ""}>
+            <label class="form-check-label" for="printLevelOne">Print Level One</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="printLevelTwo" name="print_level_2" ${printLevel2 === "true" ? "checked" : ""}>
+            <label class="form-check-label" for="printLevelTwo">Print Level Two</label>
+          </div>
+        `;
+
+        tax2Calculation.innerHTML = `
+          <label class="form-label fw-semibold">Tax 2 Calculation Method</label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="tax2_based_on" id="tax2Total" value="total" ${tax2BasedOn === 'total' ? 'checked' : ''}>
+            <label class="form-check-label" for="tax2Total">Based on invoice total only</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="tax2_based_on" id="tax2Plus" value="total_plus_tax1" ${tax2BasedOn === 'total_plus_tax1' ? 'checked' : ''}>
+            <label class="form-check-label" for="tax2Plus">Based on invoice total + first tax</label>
+          </div>
+        `;
+
+        extraRow.classList.remove('d-none');
+      }
+    }
+
+    taxRadios.forEach(radio => {
+      if (radio.value === savedTaxType) {
+        radio.checked = true;
+      }
+      radio.addEventListener('change', () => {
+        updateTaxFields(radio.value);
+      });
+    });
+
+    if (savedTaxType) {
+      updateTaxFields(savedTaxType);
+    }
+  });
+</script>
+
+<script>
+function updateCurrencyExample() {
+    console.log("updateCurrencyExample called.");
+    const sign = document.getElementById('currencySign')?.value || ''; 
+    const sep = document.getElementById('decimalSep')?.value || '';
+    const placement = document.getElementById('currencySignplacement')?.value || '';
+
+    console.log("Currency inputs:", { sign, sep, placement });
+
+    const groupSep = sep === '.' ? ',' : '.';
+    const amount = `1${groupSep}000${sep}00`;
+
+    let example = '';
+
+    switch (placement) {
+        case 'Before amount':
+            example = `${sign}${amount}`;
+            break;
+        case 'After amount':
+            example = `${amount}${sign}`;
+            break;
+        case 'Before amount with space':
+            example = `${sign} ${amount}`;
+            break;
+        case 'After amount with space':
+            example = `${amount} ${sign}`;
+            break;
+        default:
+            example = `${sign}${amount}`; 
+    }
+
+    const currencyExampleElement = document.getElementById('currencyExample');
+    if (currencyExampleElement) {
+        currencyExampleElement.value = example;
+        console.log("Currency example updated to:", example);
+    } else {
+        console.error("Error: Element with id 'currencyExample' not found.");
+    }
+}
+
+function updateDateExample() {
+    console.log("updateDateExample called.");
+    const dateFormatElement = document.getElementById('dateFormat');
+    if (!dateFormatElement) {
+        console.error("Error: Element with id 'dateFormat' not found.");
+        return;
+    }
+
+    const format = dateFormatElement.value;
+    console.log("Current dateFormat dropdown value (inside updateDateExample):", format);
+
+    if (!format || format === '') {
+        console.log("Format is empty or 'Select', clearing dateExample.");
+        const dateExampleElement = document.getElementById('dateExample');
+        if (dateExampleElement) {
+            dateExampleElement.value = ''; 
+        } else {
+            console.error("Error: Element with id 'dateExample' not found.");
+        }
+        return;
+    }
+
+    const now = new Date();
+    const dd = String(now.getDate()).padStart(2, '0');
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const yyyy = now.getFullYear();
+
+    let formatted = '';
+    switch (format) {
+        case 'dd/mm/yyyy':
+            formatted = `${dd}/${mm}/${yyyy}`;
+            break;
+        case 'mm/dd/yyyy':
+            formatted = `${mm}/${dd}/${yyyy}`;
+            break;
+        case 'yyyy/mm/dd':
+            formatted = `${yyyy}/${mm}/${dd}`;
+            break;
+        case 'yyyy-mm-dd':
+            formatted = `${yyyy}-${mm}-${dd}`;
+            break;
+        case 'mm-dd-yyyy':
+            formatted = `${mm}-${dd}-${yyyy}`;
+            break;
+        case 'dd-mm-yyyy':
+            formatted = `${dd}-${mm}-${yyyy}`;
+            break;
+        case 'yyyy.mm.dd':
+            formatted = `${yyyy}.${mm}.${dd}`;
+            break;
+        case 'dd.mm.yyyy':
+            formatted = `${dd}.${mm}.${yyyy}`;
+            break;
+        default:
+            formatted = '';
+            console.warn("Unhandled date format:", format);
+    }
+
+    const dateExampleElement = document.getElementById('dateExample');
+    if (dateExampleElement) {
+        dateExampleElement.value = formatted;
+        console.log("Date example updated to:", formatted);
+    } else {
+        console.error("Error: Element with id 'dateExample' not found.");
+    }
+}
+
+function saveCurrencySettings() {
+    updateCurrencyExample(); 
+    alert('Currency settings saved!');
+}
+
+function restoreDefaults() {
+    console.log("restoreDefaults called.");
+    document.getElementById('currency').value = 'USD';
+    document.getElementById('currencySign').value = '$';
+    document.getElementById('decimalSep').value = '.';
+    document.getElementById('currencySignplacement').value = 'Before amount';
+    document.getElementById('dateFormat').value = 'dd/mm/yyyy';
+
+    updateCurrencyExample();
+    updateDateExample();
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("---------- DOMContentLoaded Fired ----------");
+
+    const savedDateFormat = "{{ date_format.format|default:''|escapejs }}";
+    console.log("Saved Date Format (from Django template):", savedDateFormat);
+
+    const dateFormatElement = document.getElementById('dateFormat');
+    if (dateFormatElement) {
+        if (savedDateFormat) {
+            dateFormatElement.value = savedDateFormat;
+            console.log("Dropdown 'dateFormat' value explicitly set to saved value:", dateFormatElement.value);
+        } else {
+            console.log("No savedDateFormat from Django. Dropdown will use its default/first option.");
+        }
+    } else {
+        console.error("Error: 'dateFormat' select element not found during DOMContentLoaded.");
+    }
+
+    updateCurrencyExample();
+    updateDateExample(); 
+
+    console.log("---------- Initial example updates complete ----------");
+});
+</script>
+
+
+
+<script>
+  document.getElementById('logoInput').addEventListener('change', function () {
+    const input = this;
+    const preview = document.getElementById('logoPreview');
+
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block'; 
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  });
+</script>
+
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    // Get the 'open' value from the URL
+    const params = new URLSearchParams(window.location.search);
+    const openSection = params.get('open');  // e.g., "company"
+
+    const allSections = [
+      'MiscSettingsContent',
+      'CompanySettingsContent',
+      'InvoiceSettingsContent',
+      'OrderSettingsContent',
+      'EstimateSettingsContent',
+      'AdvancedSettingsContent',
+      'EmailSettingsContent',
+      'PaymentsSettingsContent',
+      'PurchaseSettingsContent'
+    ];
+
+    // Hide all sections
+    allSections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+
+    // Show the section from URL parameter
+    if (openSection) {
+      const sectionId = openSection.charAt(0).toUpperCase() + openSection.slice(1) + 'SettingsContent';
+      const sectionEl = document.getElementById(sectionId);
+      if (sectionEl) {
+        sectionEl.style.display = 'block';
+      }
+    }
+  });
+</script>
+
+
+{% endblock %}
+
+
+{% block global_modals %}
+  {% include 'includes/quick_start_modal.html' %}
+{% endblock %}

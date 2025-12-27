@@ -1,0 +1,885 @@
+{% extends 'user/user_dashboard.html' %}
+{% block content %}
+{% load custom_filters %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+
+<style>
+  body {
+    padding-top: 70px;
+    background-color: #f8f9fa;
+  }
+
+  .navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .panel {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .user-list li {
+    cursor: pointer;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .user-list li:last-child {
+    border-bottom: none;
+  }
+
+  .user-list li.active-user,
+  .user-list li:hover {
+    background-color: #e9ecef;
+  }
+
+  /* This is the styling for the scrollable user NAMES box */
+  .user-list-scroll {
+    max-height: 300px; /* Adjust as needed for the user list */
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin-bottom: 10px; /* Space between list and buttons */
+  }
+  /* --- END SCROLLABLE USER NAMES BOX --- */
+
+  @media (max-width: 1024px) {
+    .top-buttons {
+      margin-top: 50px !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .top-buttons {
+      margin-top: 0 !important;
+    }
+  }
+
+  .custom-btn {
+    width: 110px;
+    height: 100px;
+    padding: 12px 8px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+    word-wrap: break-word;
+  }
+
+  .settings-scroll-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 5px;
+  }
+
+  .settings-scroll-container::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .settings-scroll-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+  }
+
+  .settings-scroll-container .btn {
+    min-width: 150px;
+    text-align: center;
+    white-space: normal;
+    margin-right: 2px;
+    border-radius: 0;
+    border: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    color: #495057;
+    transition: 0.2s ease-in-out;
+  }
+
+    /* .settings-scroll-container .btn.active-setting {
+    background-color: #FFAA17;
+    color: white;
+    font-weight: 500;
+    z-index: 1;
+  } */
+
+  .card {
+    border-radius: 10px;
+    background-color: #fff;
+    margin-bottom: 50px;
+  }
+
+  /* Initially hide admin panel content */
+  #adminPanelContent {
+    display: none;
+  }
+  .btn-close.btn-close-white {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M2.146 2.146a.5.5 0 011 0L8 6.293l4.854-4.854a.5.5 0 11.708.708L8.707 7l4.854 4.854a.5.5 0 01-.708.708L8 7.707l-4.854 4.854a.5.5 0 01-.708-.708L7.293 7 2.146 2.854a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+  filter: none;
+  opacity: 1;
+}
+  #userProfileView input {
+    font-size: 1rem;
+    min-width: 5%;
+    padding: 10px;
+  }
+
+  @media (max-width: 768px) {
+    #userProfileView .row {
+      flex-direction: column;
+    }
+
+    #userProfileView .col-md-4 {
+      width: 100% !important;
+      margin-bottom: 10px;
+    }
+
+    #userProfileView button {
+      width: 100%;
+    }
+  }
+  .modal-backdrop {
+  opacity: 0.2 !important;
+}
+  .invoice-preview {
+    background: white;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+  }
+
+
+  .custom-invoice-table td {
+    border: 1px solid #ccc;
+    vertical-align: middle;
+  }
+
+  .custom-invoice-table .no-left-border td:first-child {
+    border-left: none;
+  }
+
+  .custom-invoice-table .text-end {
+    text-align: right;
+  }
+    .invoice-preview {
+        box-sizing: border-box;
+        position: relative; 
+    }
+
+    .invoice-preview.a4 {
+        width: 210mm;
+        min-height: 297mm; 
+    }
+
+    .invoice-preview.letter {
+        width: 215.9mm;
+        min-height: 279.4mm; 
+    }
+
+    .logo-section {
+        position: relative; 
+    }
+
+    .bill-ship-to-section {
+        position: relative; 
+    }
+.editable-label {
+  cursor: default; 
+}
+
+
+</style>
+
+<div class="container">
+  <div class="d-flex justify-content-start mb-3 top-buttons gap-2">
+    <a href="#" class="btn btn-outline-primary custom-btn text-center" data-bs-toggle="modal" data-bs-target="#quickWizardModal">
+      <i class="fas fa-play fa-lg mb-1"></i><br>
+      Quick Start<br>Wizard
+    </a>
+
+
+    <a href="#" class="btn btn-outline-primary custom-btn text-center">
+      <i class="fas fa-book fa-lg mb-1"></i><br>
+      Online<br>User Manual
+    </a>
+    <a href="#" class="btn btn-outline-primary custom-btn text-center">
+      <i class="fas fa-circle-up fa-lg mb-1"></i><br>
+      Upgrade to<br>PRO Now
+    </a>
+  </div>
+
+  <div class="card shadow-sm p-3">
+    <div class="settings-scroll-container mb-3 border-bottom pb-2">
+      <div class="d-flex flex-nowrap gap-1" id="settingTabs">
+        <a href="{% url 'user_miscellaneous_settings' %}" class="btn btn-light flex-shrink-0">Miscellaneous</a>
+        <a href="{% url 'user_settings' %}?open=company" class="btn btn-light flex-shrink-0">Company Settings</a>
+        <a href="{% url 'user_invoice_settings' %}?section=invoice" class="btn btn-light flex-shrink-0">Invoice Settings</a>
+        <a href="{% url 'user_order_settings' %}?section=order" class="btn btn-light flex-shrink-0">Order Settings<a>
+        <button class="btn flex-shrink-0" onclick="showSection(this, 'estimate')">Estimate Settings</button>
+        <a href="{% url 'user_advanced_settings' %}" class="btn btn-light flex-shrink-0">Advanced Settings</a>
+          <a href="{% url 'user_email_templates' %}" class="btn btn-light flex-shrink-0">Email Templates</a>
+          <a href="{% url 'user_payment_settings_view' %}" class="btn btn-light flex-shrink-0">payments</a>
+        <a href="{% url 'user_purchase_order' %}?section=purchase" class="btn btn-light flex-shrink-0">Purchase Order</a>
+      </div>
+    </div>
+
+    <div id="settingsContent" class="mt-3">
+
+      <div id="MiscSettingsContent" style="display: none;">
+        <p>Miscellaneous Settings</p>
+      </div>
+
+      <div id="EstimateSettingsContent" style="display: block;">
+        <div class="mt-3">
+          <h5 class="mb-4">Estimate Template Settings</h5>
+          <form action="{% url 'user_update_estimate_settings' %}" method="post">
+            {% csrf_token %}
+            <div class="container-fluid">
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label"><strong>Estimate# Prefix:</strong></label>
+              <input type="text" name="estimate_number_prefix1" id="estimate_number_prefix1" class="form-control"  value="{{ template1_settings.estimate_number_prefix|default:'EST' }}">
+
+
+              </div>
+                <div class="col-md-6">
+                  <label class="form-label"><strong>Select Template:</strong></label>
+                <select name="template" class="form-select" onchange="toggleTemplatePreview(this.options[this.selectedIndex].dataset.previewId)">
+                  {% for t in templates %}
+                  <option value="{{ t.id }}" data-preview-id="template{{ forloop.counter }}" {% if t.id == current_template.id %}selected{% endif %}>
+                      {% if t.template_name == "Professional 1" %}
+                      Professional 1 (Logo Left)
+                      {% elif t.template_name == "Professional 2" %}
+                      Professional 2 (Logo Right)
+                      {% else %}
+                      {{ t.template_name }}
+                      {% endif %}
+                  </option>
+                  {% endfor %}
+              </select>
+                </div>
+              </div>
+
+              <div class="row">
+                  <div class="col-lg-3">
+                    <div class="mb-3">
+                      <label class="form-label"><strong>Starting Estimate Number:</strong></label>
+                      <input type="number" class="form-control" name="estimate_starting_number1" id="estimate_starting_number" value="{{ template1_settings.estimate_starting_number|default:1 }}">
+                    </div>
+                    <div class="mb-3" id="headerColorSection1">
+                      <label class="form-label"><strong>Header Background Color</strong></label>
+                      <div class="d-flex align-items-center gap-2">
+                          <select class="form-select" name="header_background_color" id="headerColorSelect1" style="max-width: 250px;" onchange="updateBackgroundColorPreview(this.value)">
+                           <option value="" disabled selected>Select</option>
+                              <option value="#FF5733">🔴 Coral Red</option>
+                              <option value="#007BFF">🔵 Ocean Blue</option>
+                              <option value="#6F42C1">🟣 Purple Haze</option>
+                              <option value="#343A40">⚫ Charcoal Gray</option>
+                              <option value="#20C997">🧊 Mint Green</option>
+                              <option value="#FD7E14">🟠 Tangy Orange</option>
+
+                          </select>
+                          <input type="hidden" name="header_background_color_final" id="finalColorInput" value="{{ template1_settings.header_background_color }}">
+
+                        <!-- Color picker -->
+                        <input type="color" id="customColorPicker" class="form-control form-control-color"  name="header_background_color_picker_1" title="Pick custom color" 
+                              value="{{ template1_settings.header_background_color|default:'#f0ad4e' }}" />
+                      </div>
+                     </div>
+                      <!-- Template 1 Label Editor -->
+                      <div id="label-section-template1" class="label-section" {% if current_template.template_name != "Professional 1" %}{% endif %}>
+                        <div class="mb-4">
+                          <label class="form-label"><strong>Customize Estimate Text Labels:</strong></label>
+                          <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto;">
+                            <div class="mb-2">
+                              <input type="text" name="estimate_label" class="form-control form-control-sm" value="{{ template1_settings.estimate_label|default:'Estimate' }}">
+                            </div>
+                            <div class="mb-2">
+                              <input type="text" name="estimate_number_label" class="form-control form-control-sm" value="{{ template1_settings.estimate_number_label|default:'Estimate #' }}">
+                            </div>
+                            <div class="mb-2">
+                              <input type="text" name="estimate_date_label" class="form-control form-control-sm" value="{{ template1_settings.estimate_date_label|default:'Estimate Date' }}">
+                            </div>
+                            <div class="mb-2">
+                              <input type="text" name="due_date_label" class="form-control form-control-sm" value="{{ template1_settings.due_date_label|default:'Due Date' }}">
+                            </div>
+                            <div class="mb-2">
+                              <input type="text" name="estimate_to" class="form-control form-control-sm" value="{{ template1_settings.estimate_to|default:'Estimate To' }}">
+                            </div>
+                            <div class="mb-2">
+                              <input type="text" name="estimate_total" class="form-control form-control-sm" value="{{ template1_settings.estimate_total|default:'Estimate Total' }}">
+                            </div>
+                          </div>
+                      </div>
+
+
+                          <!-- Hidden Inputs for Saving -->
+                          <!-- <input type="hidden" name="estimate_label" value="{{ template1_settings.estimate_label }}">
+                          <input type="hidden" name="estimate_number_label" value="{{ template1_settings.estimate_number_label }}">
+                          <input type="hidden" name="estimate_date_label" value="{{ template1_settings.estimate_date_label }}">
+                          <input type="hidden" name="due_date_label" value="{{ template1_settings.due_date_label }}">
+                          <input type="hidden" name="estimate_to" value="{{ template1_settings.estimate_to }}">
+                          <input type="hidden" name="estimate_total" value="{{ template1_settings.estimate_total }}">
+                          <input type="hidden" name="estimate_terms_footer" value="{{ template1_settings.estimate_terms_footer }}"> -->
+
+                          <div class="d-flex justify-content-start gap-2 mb-2">
+                          <button type="submit" class="btn" style="background-color:#FFAA17;color: white;">Save</button>
+                          <button type="button" class="btn btn-secondary" onclick="restoreTemplateDefaults()">Restore Default</button>
+                        </div>
+                      </div>
+                    </div>
+
+                <div class="col-lg-9">
+
+                  <div style="border: 1px solid #ccc; padding: 20px; background-color: #f1f4fa; max-height: 500px; overflow-y: auto; overflow-x: auto;">
+                    <div style="min-width: 820px;">
+                      <div class="mt-5">
+
+                    <div id="template1" class="invoice-preview bg-white p-4 shadow-sm mx-auto d-flex flex-column"
+                        style="width: 800px; min-height: 1122px;"
+                        data-page-size="{{ template1_obj.page_size }}"
+                        data-right-margin-mm="{{ template1_obj.right_margin_mm|default:0 }}"
+                        data-shift-left-mm="{{ template1_obj.invoice_block_shift_left_mm|default:0 }}"
+                        data-shift-top-mm="{{ template1_obj.invoice_block_shift_top_mm|default:0 }}">
+
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <img src="{{ logo.image.url }}" alt="Logo" class="mb-2" style="max-height: 60px;"><br>
+                            <div><strong>{{ template1_settings.estimate_number_label|default:"Order #" }}:</strong> {{ template1_settings.estimate_number_prefix|default:"EST" }}{{ template1_settings.estimate_starting_number|default:"1" }}/2025</div>
+                            <div><strong>{{ template1_settings.estimate_date_label|default:"Estimate Date:" }}</strong> 2025-06-18</div>
+                            <div><strong>{{ template1_settings.due_date_label|default:"Due Date:" }}</strong> 2025-06-25</div>
+                            <div><strong>Terms:</strong>NET 15</div>
+                        </div>
+                        <div class="text-end">
+                            <h5 class="mb-1">{{ company.company_name }}</h5>
+                            <div>{{ company.address }}</div>
+                            <div>Phone: +91-1234567890</div>
+                            <div>{{ company.sales_tax_reg_no }}</div>
+                            <h2 class="fw-bold mt-2">{{ template1_settings.estimate_label|default:"Estimate" }}</h2>
+                            <div class="text-muted">Tax Exempted</div>
+                        </div>
+                        </div>
+                        <div class="row mb-5">
+                          <div class="col-6">
+                            <strong>{{ template1_settings.estimate_to|default:"Estimate To" }}</strong>
+                            <hr class="my-1">
+                            <div>Jane Doe</div>
+                            <div>456 Another St, City</div>
+                          </div>
+                          <div class="col-6 text-end">
+                            <strong>Ship To</strong>
+                            <hr class="my-1">
+                            <div>John Smith</div>
+                            <div>789 Delivery Lane, City</div>
+                          </div>
+                        </div>
+
+                        <table class="table custom-invoice-table mb-4">
+                              <thead id="template1-thead">
+
+                            <tr>
+                              <th>ID/SKU</th>
+                              <th>Product/Service Description</th>
+                              <th class="text-end">Quantity</th>
+                              <th class="text-end">Unit Price</th>
+                              <th class="text-end">Price</th>
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            <tr>
+                              <td>PRO-0001</td>
+                              <td>aaaaaaaaa</td>
+                              <td class="text-end">1</td>
+                              <td class="text-end">200.00</td>
+                              <td class="text-end">200.00</td>
+                            </tr>
+                            <tr>
+                              <td colspan="2" style="border: none;"></td>
+                              <td class="text-start"><strong>Subtotal:</strong></td>
+                              <td colspan="2" class="text-end">200.00</td>
+                            </tr>
+                            <tr>
+                              <td colspan="2" style="border: none;"></td>
+                              <td class="text-start"><strong>Tax 1:</strong></td>
+                              <td colspan="2" class="text-end">18.00</td>
+                            </tr>
+                            <tr>
+                              <td colspan="2" style="border: none;"></td>
+                              <td class="text-start"><strong>{{ template1_settings.estimate_total|default:"Estimate Total" }}:</strong></td>
+                              <td colspan="2" class="text-end fw-bold">238.00</td>
+                            </tr>
+                            <tr>
+                              <td colspan="2" style="border: none;"></td>
+                              <td class="text-start"><strong>Total Paid:</strong></td>
+                              <td colspan="2" class="text-end">100.00</td>
+                            </tr>
+                            <tr>
+                              <td colspan="2" style="border: none;"></td>
+                              <td class="text-start"><strong>Balance:</strong></td>
+                              <td colspan="2" class="text-end text-danger fw-bold">138.00</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div class="flex-grow-1"></div>
+
+                      <div class="mt-4">
+                        <h6 style="text-decoration: underline;">Terms and Conditions</h6>
+                            <p>{{ template1_settings.estimate_terms_footer|default:"Page footer text goes here...." }}</p>
+                      </div>
+                      <div class="text-end mt-3">
+                        <small>Page 1 of 1</small>
+                      </div>
+                    </div>
+
+                    <div id="template2" class="invoice-preview bg-white p-4 shadow-sm mx-auto d-flex flex-column d-none"
+                        style="width: 800px; min-height: 1122px;"
+                        data-page-size="{{ template2_obj.page_size }}"
+                        data-right-margin-mm="{{ template2_obj.right_margin_mm|default:0 }}"
+                        data-shift-left-mm="{{ template2_obj.invoice_block_shift_left_mm|default:0 }}"
+                        data-shift-top-mm="{{ template2_obj.invoice_block_shift_top_mm|default:0 }}">
+
+                      <!-- Header -->
+                      <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                          <h5 class="mb-1">{{ company.company_name }}</h5>
+                          <div>{{ company.address }}</div>
+                          <div>Phone: +91-1234567890</div>
+                          <div>{{ company.sales_tax_reg_no }}</div>
+                            <h2 class="fw-bold mt-2">{{ template2_settings.estimate_label|default:"Estimate" }}</h2>
+                          <div class="text-muted">Tax Exempted</div>
+                        </div>
+
+                        <div class="text-end">
+                          <img src="{{ logo.image.url }}" alt="Logo" class="mb-2" style="max-height: 60px;"><br>
+                            <div><strong>{{ template2_settings.estimate_number_label|default:"Estimate #" }}:</strong> {{ template2_settings.estimate_number_prefix|default:"EST" }}{{ template2_settings.estimate_starting_number|default:"1" }}/2025</div>
+                            <div><strong>{{ template2_settings.estimate_date_label|default:"Estimate Date:" }}</strong> 2025-06-18</div>
+                            <div><strong>{{ template2_settings.due_date_label|default:"Due Date:" }}</strong> 2025-06-25</div>
+                            <div><strong>Terms:</strong>NET 15</div>
+                        </div>
+                      </div>
+
+                      <!-- Bill/Ship -->
+                      <div class="row mb-5">
+                        <div class="col-6">
+                          <strong>{{ template2_settings.estimate_to|default:"Estimate To" }}</strong>
+                          <hr class="my-1">
+                          <div>Jane Doe</div>
+                          <div>456 Another St, City</div>
+                        </div>
+                        <div class="col-6 text-end">
+                          <strong>Ship To</strong>
+                          <hr class="my-1">
+                          <div>John Smith</div>
+                          <div>789 Delivery Lane, City</div>
+                        </div>
+                      </div>
+
+                      <!-- Table -->
+                      <table class="table custom-invoice-table mb-4">
+                        <thead id="template2-thead">
+                          <tr>
+                            <th>ID/SKU</th>
+                            <th>Product/Service Description</th>
+                            <th class="text-end">Quantity</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Price</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>PRO-0001</td>
+                            <td>aaaaaaaaa</td>
+                            <td class="text-end">1</td>
+                            <td class="text-end">200.00</td>
+                            <td class="text-end">200.00</td>
+                          </tr>
+
+                          <tr>
+                            <td colspan="2" style="border: none;"></td>
+                            <td class="text-start"><strong>Subtotal:</strong></td>
+                            <td colspan="2" class="text-end">200.00</td>
+                          </tr>
+                          <tr>
+                            <td colspan="2" style="border: none;"></td>
+                            <td class="text-start"><strong>Tax 1:</strong></td>
+                            <td colspan="2" class="text-end">18.00</td>
+                          </tr>
+                          <tr>
+                            <td colspan="2" style="border: none;"></td>
+                            <td class="text-start"><strong></strong></td>
+                            <td colspan="2" class="text-end">20.00</td>
+                          </tr>
+                          <tr>
+                            <td colspan="2" style="border: none;"></td>
+                            <td class="text-start"><strong>{{ template2_settings.estimate_total|default:"Estimate Total" }}:</strong></td>
+                            <td colspan="2" class="text-end fw-bold">238.00</td>
+                          </tr>
+                          <tr>
+                            <td colspan="2" style="border: none;"></td>
+                            <td class="text-start"><strong>Total Paid</strong></td>
+                            <td colspan="2" class="text-end">100.00</td>
+                          </tr>
+                          <tr>
+                            <td colspan="2" style="border: none;"></td>
+                            <td class="text-start"><strong>Balance :</strong></td>
+                            <td colspan="2" class="text-end text-danger fw-bold">138.00</td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <!-- Footer -->
+                      <div class="flex-grow-1"></div>
+                      <div class="mt-4">
+                        <h6 style="text-decoration: underline;">Terms and Conditions</h6>
+                        <p>{{ template2_settings.estimate_terms_footer|default:"Page footer text goes here...." }}</p>
+                      </div>
+                      <div class="text-end mt-3"><small>Page 1 of 1</small></div>
+                    </div>
+
+
+                      </div>
+                    </div>
+                  </div>
+                  <h6 class="mt-3">Predefined Terms and Conditions text for Estimate</h6>
+                  <div class="mt-1 d-flex justify-content-center">
+                    <div style="width: 100%; max-height: 100px; overflow-y: auto;">
+                      <textarea name="estimate_terms_footer" class="form-control shadow-sm"
+                                rows="6"
+                                style="resize: vertical;">{{ template2_settings.estimate_terms_footer }}</textarea>
+                    </div>
+                  </div>
+
+
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+
+
+      <div id="AdvancedSettingsContent">
+        <h4 class="mb-4">Template Advanced Settings</h4>
+      </div>
+
+      <div id="EmailSettingsContent" style="display: none;">
+        <p>Email Templates</p>
+      </div>
+
+      <div id="PaymentsSettingsContent" style="display: none;">
+        <p>Payments Settings</p>
+      </div>
+
+      <div id="PurchaseSettingsContent" style="display: none;">
+        <p>Purchase Order Settings</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function showSection(button, section) {
+    document.querySelectorAll('#settingTabs button').forEach(btn =>
+      btn.classList.remove('active-setting')
+    );
+    if (button) {
+      button.classList.add('active-setting');
+    }
+
+    const allSections = [
+      'MiscSettingsContent',
+      'CompanySettingsContent',
+      'InvoiceSettingsContent',
+      'OrderSettingsContent',
+      'EstimateSettingsContent',
+      'AdvancedSettingsContent',
+      'EmailSettingsContent',
+      'PaymentsSettingsContent',
+      'PurchaseSettingsContent'
+    ];
+
+    allSections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+
+    const sectionId = section.charAt(0).toUpperCase() + section.slice(1) + 'SettingsContent';
+    const currentSection = document.getElementById(sectionId);
+    if (currentSection) currentSection.style.display = 'block';
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const section = urlParams.get('section') || 'estimate';
+
+    const matchingButton = Array.from(document.querySelectorAll('#settingTabs button')).find(btn =>
+      btn.textContent.toLowerCase().includes(section)
+    );
+
+    showSection(matchingButton, section);
+  });
+</script>
+
+
+<script>
+  function applyTemplateStyles(templateId) {
+    const container = document.getElementById(templateId);
+    if (!container) return;
+
+    const pageSize = container.dataset.pageSize;
+    const rightMargin = parseFloat(container.dataset.rightMarginMm) || 0;
+    const shiftLeft = parseFloat(container.dataset.shiftLeftMm) || 0;
+    const shiftTop = parseFloat(container.dataset.shiftTopMm) || 0;
+
+    if (pageSize === "A4") {
+      container.style.width = "800px";
+      container.style.minHeight = "1122px";
+    } else if (pageSize === "Letter") {
+      container.style.width = "775px";
+      container.style.minHeight = "1056px";
+    }
+
+    const headerDflex = container.querySelector(".d-flex.justify-content-between.align-items-start.mb-4");
+    if (headerDflex) {
+      const rightBlock = headerDflex.querySelector(".text-end");
+      if (rightBlock) {
+        rightBlock.style.marginLeft = "auto";
+        rightBlock.style.marginRight = rightMargin + "mm";
+      }
+    }
+
+    const invoiceToBox = container.querySelector(".row.mb-5");
+    if (invoiceToBox) {
+      invoiceToBox.style.marginLeft = shiftLeft + "mm";
+      invoiceToBox.style.marginTop = shiftTop + "mm";
+    }
+  }
+
+  function toggleTemplatePreview(previewId) {
+    document.querySelectorAll('.invoice-preview').forEach(div => div.classList.add('d-none'));
+
+    const selectedTemplateElement = document.getElementById(previewId);
+    if (selectedTemplateElement) {
+      selectedTemplateElement.classList.remove('d-none');
+
+      applyTemplateStyles(previewId);
+    }
+
+    const labelSection1 = document.getElementById("label-section-template1");
+    const headerColorSection1 = document.getElementById("headerColorSection1");
+
+    if (labelSection1) labelSection1.style.display = "block";
+    if (headerColorSection1) headerColorSection1.style.display = "block";
+  }
+
+  function setupColorPickerSync(pickerId, hiddenInputId) {
+    const picker = document.getElementById(pickerId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+
+    if (picker && hiddenInput) {
+      picker.addEventListener("input", function () {
+        hiddenInput.value = this.value;
+      });
+
+      hiddenInput.value = picker.value;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const selectElement = document.querySelector('select[name="template"]');
+    if (selectElement && selectElement.options.length > 0) {
+      const selectedOption = selectElement.options[selectElement.selectedIndex];
+      const initialPreviewId = selectedOption.dataset.previewId;
+      toggleTemplatePreview(initialPreviewId);
+    }
+
+    setupColorPickerSync("customColorPicker", "finalColorInput");
+  });
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  function makeEditable(label) {
+    const currentText = label.textContent.trim();
+    const fieldName = label.dataset.field;
+
+    const isTemplate2 = label.closest("#label-section-template2") !== null;
+    const inputName = isTemplate2 ? `${fieldName}_2` : fieldName;
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "form-control form-control-sm";
+    input.value = currentText;
+
+    label.replaceWith(input);
+    input.focus();
+
+    input.addEventListener("blur", function () {
+      const newValue = input.value.trim() || " ";
+
+      const newLabel = document.createElement("span");
+      newLabel.className = "editable-label";
+      newLabel.dataset.field = fieldName;
+      newLabel.textContent = newValue;
+
+      const hiddenInput = document.querySelector(`input[name="${inputName}"]`);
+      if (hiddenInput) hiddenInput.value = newValue;
+
+      input.replaceWith(newLabel);
+      newLabel.addEventListener("dblclick", () => makeEditable(newLabel));
+    });
+  }
+
+  document.querySelectorAll(".editable-label").forEach(label => {
+    label.addEventListener("dblclick", function () {
+      const existingInput = document.querySelector(".form-control-sm");
+      if (existingInput) {
+        existingInput.blur();
+      }
+      makeEditable(label);
+    });
+  });
+
+});
+</script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    function isDarkColor(hexColor) {
+      if (!hexColor || hexColor.length < 4) return false;
+      if (hexColor.length === 4) {
+        hexColor = '#' + hexColor[1] + hexColor[1] + hexColor[2] + hexColor[2] + hexColor[3] + hexColor[3];
+      }
+      const c = hexColor.substring(1);
+      const r = parseInt(c.substring(0, 2), 16);
+      const g = parseInt(c.substring(2, 4), 16);
+      const b = parseInt(c.substring(4, 6), 16);
+      const luma = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luma < 0.5;
+    }
+
+    function applyHeaderColorToSpecificThead(thead, colorValue) {
+      if (!thead) return;
+
+      const thElements = thead.querySelectorAll("th");
+
+      thead.style.backgroundColor = "";
+      thead.style.color = "";
+      thead.className = thead.className.replace(/table-\w+/g, "").trim();
+
+      thElements.forEach(th => {
+        th.style.backgroundColor = "";
+        th.style.color = "";
+        th.style.boxShadow = "";
+        th.className = th.className.replace(/table-\w+/g, "").trim();
+        th.classList.remove("text-white", "text-dark");
+      });
+
+      if (colorValue.startsWith("#") || /^[a-zA-Z]+$/.test(colorValue)) {
+        thElements.forEach(th => {
+          th.style.backgroundColor = colorValue;
+          th.style.boxShadow = "none";
+          th.style.color = isDarkColor(colorValue) ? "#fff" : "#000";
+        });
+      } else {
+        thead.classList.add("table-" + colorValue);
+      }
+    }
+
+    function getHexFromName(colorName) {
+      const ctx = document.createElement("canvas").getContext("2d");
+      ctx.fillStyle = colorName;
+      return ctx.fillStyle;
+    }
+
+    function matchDropdownToColor(colorHex) {
+      const dropdown = document.getElementById("headerColorSelect1");
+      if (!dropdown) return;
+
+      for (let option of dropdown.options) {
+        const optionHex = getHexFromName(option.value);
+        if (optionHex.toLowerCase() === colorHex.toLowerCase()) {
+          dropdown.value = option.value;
+          return;
+        }
+      }
+
+      dropdown.value = ""; 
+    }
+
+    const picker = document.getElementById("customColorPicker");
+    const hiddenInput = document.getElementById("finalColorInput");
+    const dropdown = document.getElementById("headerColorSelect1");
+
+    if (picker && hiddenInput) {
+      picker.addEventListener("input", function () {
+        const hex = this.value;
+        hiddenInput.value = hex;
+        matchDropdownToColor(hex);
+
+        const activePreview = document.querySelector(".invoice-preview:not(.d-none)");
+        const thead = activePreview ? activePreview.querySelector("thead") : null;
+        if (thead) {
+          applyHeaderColorToSpecificThead(thead, hex);
+        }
+      });
+
+      hiddenInput.value = picker.value;
+      matchDropdownToColor(picker.value);
+    }
+
+    if (dropdown && hiddenInput && picker) {
+      dropdown.addEventListener("change", function () {
+        const selected = this.value;
+        const hex = getHexFromName(selected);
+        picker.value = hex;
+        hiddenInput.value = hex;
+
+        const activePreview = document.querySelector(".invoice-preview:not(.d-none)");
+        const thead = activePreview ? activePreview.querySelector("thead") : null;
+        if (thead) {
+          applyHeaderColorToSpecificThead(thead, hex);
+        }
+      });
+    }
+
+    const thead1 = document.getElementById("template1-thead");
+    const thead2 = document.getElementById("template2-thead");
+    const stored1 = "{{ template1_settings.header_background_color|default:'#ffa500' }}";
+    const stored2 = "{{ template2_settings.header_background_color|default:'#ffa500' }}";
+
+    if (thead1) applyHeaderColorToSpecificThead(thead1, stored1);
+    if (thead2) applyHeaderColorToSpecificThead(thead2, stored2);
+  });
+</script>
+
+
+<script>
+  function restoreTemplateDefaults() {
+    const selectedTemplateId = document.querySelector('select[name="template"]').value;
+    window.location.href = `/user_restore_estimate_defaults/?template=${selectedTemplateId}`;
+  }
+</script>
+
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
+
+{% endblock %}
+
+
+{% block global_modals %}
+  {% include 'includes/quick_start_modal.html' %}
+{% endblock %}

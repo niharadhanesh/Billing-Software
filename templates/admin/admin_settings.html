@@ -1,0 +1,652 @@
+{% extends 'admin/admin_dashboard.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+
+<style>
+  body {
+    padding-top: 70px;
+    background-color: #f8f9fa;
+  }
+
+  .navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .panel {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .user-list li {
+    cursor: pointer;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .user-list li:last-child {
+    border-bottom: none;
+  }
+
+  .user-list li.active-user,
+  .user-list li:hover {
+    background-color: #e9ecef;
+  }
+
+  .user-list-scroll {
+    max-height: 300px; 
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin-bottom: 10px; 
+  }
+
+  @media (max-width: 1024px) {
+    .top-buttons {
+      margin-top: 50px !important;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .top-buttons {
+      margin-top: 0 !important;
+    }
+  }
+
+  .custom-btn {
+    width: 110px;
+    height: 100px;
+    padding: 12px 8px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+    word-wrap: break-word;
+  }
+
+  .settings-scroll-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 5px;
+  }
+
+  .settings-scroll-container::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .settings-scroll-container::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+  }
+
+  .settings-scroll-container .btn {
+    min-width: 150px;
+    text-align: center;
+    white-space: normal;
+    margin-right: 2px;
+    border-radius: 0;
+    border: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    color: #495057;
+    transition: 0.2s ease-in-out;
+  }
+
+  /* .settings-scroll-container .btn.active-setting {
+    background-color: #FFAA17;
+    color: white;
+    font-weight: 500;
+    z-index: 1;
+  } */
+
+  .card {
+    border-radius: 10px;
+    background-color: #fff;
+  }
+
+  #adminPanelContent {
+    display: none;
+  }
+  .btn-close.btn-close-white {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M2.146 2.146a.5.5 0 011 0L8 6.293l4.854-4.854a.5.5 0 11.708.708L8.707 7l4.854 4.854a.5.5 0 01-.708.708L8 7.707l-4.854 4.854a.5.5 0 01-.708-.708L7.293 7 2.146 2.854a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+  filter: none;
+  opacity: 1;
+}
+  #userProfileView input {
+    font-size: 1rem;
+    min-width: 5%;
+    padding: 10px;
+  }
+
+  @media (max-width: 768px) {
+    #userProfileView .row {
+      flex-direction: column;
+    }
+
+    #userProfileView .col-md-4 {
+      width: 100% !important;
+      margin-bottom: 10px;
+    }
+
+    #userProfileView button {
+      width: 100%;
+    }
+  }
+  .modal-backdrop {
+  opacity: 0.2 !important;
+}
+
+</style>
+
+<div class="container">
+  <div class="d-flex justify-content-start mb-3 top-buttons gap-2">
+  <a href="#" class="btn btn-outline-primary custom-btn text-center" data-bs-toggle="modal" data-bs-target="#quickWizardModal">
+  <i class="fas fa-play fa-lg mb-1"></i><br>
+  Quick Start<br>Wizard
+</a>
+
+
+    <a href="#" class="btn btn-outline-primary custom-btn text-center">
+      <i class="fas fa-book fa-lg mb-1"></i><br>
+      Online<br>User Manual
+    </a>
+    <a href="#" class="btn btn-outline-primary custom-btn text-center">
+      <i class="fas fa-circle-up fa-lg mb-1"></i><br>
+      Upgrade to<br>PRO Now
+    </a>
+  </div>
+  
+
+  <div class="card shadow-sm p-3">
+    <div class="settings-scroll-container mb-3 border-bottom pb-2">
+      <div class="d-flex flex-nowrap gap-1" id="settingTabs">
+        <a href="{% url 'miscellaneous_settings' %}" class="btn btn-light flex-shrink-0">Miscellaneous</a>
+        <a href="{% url 'company_settings' %}" class="btn btn-light flex-shrink-0">Company Settings</a> 
+        <a href="{% url 'invoice_settings' %}?section=invoice" class="btn btn-light flex-shrink-0">Invoice Settings</a>
+        <a href="{% url 'order_settings' %}?section=order" class="btn btn-light flex-shrink-0">Order Settings</a>
+        <a href="{% url 'estimate_settings' %}?section=estimate" class="btn btn-light flex-shrink-0">Estimate Settings</a>
+        <button class="btn flex-shrink-0" onclick="showSection(this, 'admin')">Administrator Panel</button>
+        <a href="{% url 'advanced_settings' %}" class="btn btn-light flex-shrink-0">Advanced Settings</a>
+        <a href="{% url 'email_templates' %}" class="btn btn-light flex-shrink-0">Email Templates</a>
+        <a href="{% url 'payment_settings_view' %}" class="btn btn-light flex-shrink-0">Payments</a>
+        <a href="{% url 'purchase_order' %}?section=purchase" class="btn btn-light flex-shrink-0">Purchase Order</a>
+      </div>
+    </div>
+
+    <div id="settingsContent" class="mt-3">
+      <p>Please select a settings category from above.</p>
+
+      <div id="adminPanelContent">
+        <h4>Administrator Panel</h4>
+        <div class="row mt-3">
+          <div class="col-md-5">
+            <div class="user-list-scroll bg-light">
+            <ul class="list-unstyled user-list" id="userList">
+              {% for i in users %}
+                <li class="user-item"
+                    data-userid="{{ i.user.id }}"
+                    data-email="{{ i.user.email }}"
+                    data-modules='{
+                      "create_invoice": {{ i.create_invoice|yesno:"true,false" }},
+                      "delete_invoice": {{ i.delete_invoice|yesno:"true,false" }},
+                      "void_invoice": {{ i.void_invoice|yesno:"true,false" }},
+                      "mark_invoice_as_paid": {{ i.mark_invoice_as_paid|yesno:"true,false" }},
+                      "create_order": {{ i.create_order|yesno:"true,false" }},
+                      "delete_order": {{ i.delete_order|yesno:"true,false" }},
+                      "create_estimate": {{ i.create_estimate|yesno:"true,false" }},
+                      "delete_estimate": {{ i.delete_estimate|yesno:"true,false" }},
+                      "create_expense": {{ i.create_expense|yesno:"true,false" }},
+                      "delete_expense": {{ i.delete_expense|yesno:"true,false" }},
+                      "turn_orders_into_invoices": {{ i.turn_orders_into_invoices|yesno:"true,false" }},
+                      "turn_estimates_into_invoices": {{ i.turn_estimates_into_invoices|yesno:"true,false" }},
+                      "rebill_expenses": {{ i.rebill_expenses|yesno:"true,false" }},
+                      "send_sms_notification": {{ i.send_sms_notification|yesno:"true,false" }},
+                      "create_customer": {{ i.create_customer|yesno:"true,false" }},
+                      "delete_customer": {{ i.delete_customer|yesno:"true,false" }},
+                      "import_customers": {{ i.import_customers|yesno:"true,false" }},
+                      "create_product_service": {{ i.create_product_service|yesno:"true,false" }},
+                      "delete_product_service": {{ i.delete_product_service|yesno:"true,false" }},
+                      "import_products": {{ i.import_products|yesno:"true,false" }},
+                      "run_reports": {{ i.run_reports|yesno:"true,false" }},
+                      "generate_recurring_invoices": {{ i.generate_recurring_invoices|yesno:"true,false" }},
+                      "create_purchase_order": {{ i.create_purchase_order|yesno:"true,false" }},
+                      "delete_purchase_order": {{ i.delete_purchase_order|yesno:"true,false" }},
+                      "modify_invoice_settings": {{ i.modify_invoice_settings|yesno:"true,false" }},
+                      "modify_order_settings": {{ i.modify_order_settings|yesno:"true,false" }},
+                      "modify_estimate_settings": {{ i.modify_estimate_settings|yesno:"true,false" }}
+                    }'>
+                  {{ i.user.username }}
+                </li>
+              {% empty %}
+                <li class="text-muted">No users found.</li>
+              {% endfor %}
+            </ul>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-sm btn-success" id="addUserBtn" data-bs-toggle="modal" data-bs-target="#addUserModal"><i class="fas fa-plus"></i> Add User</button>
+              <button class="btn btn-sm btn-danger" id="deleteUserBtn"><i class="fas fa-trash"></i> Delete User</button>
+            </div>
+          </div>
+          <div class="col-md-7">
+            <h5>User Profile</h5>
+            <div class="card p-3" id="userProfileView">
+              <p class="text-muted">Select a user from the list to view their profile.</p>
+              </div>
+          </div>
+        </div>
+      </div>
+      </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #FFAA17;color: white;">
+        <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addUserForm" action="{% url 'add_user' %}" method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="newUserName" class="form-label">User Name</label>
+            <input type="text" class="form-control" id="newUserName" name="name" placeholder="Enter your name" required>
+          </div>
+          <div class="mb-3">
+            <label for="newUserEmail" class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="newUserEmail" name="email" placeholder="Enter your email" required>
+            <span class="text-danger small" id="emailError"></span>
+          </div>
+          <div class="mb-3">
+            <label for="newUserPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="newUserPassword" name="pswd" placeholder="Enter Password" required>
+            <span class="text-danger small" id="passwordError"></span>
+          </div>
+          <div class="mb-3">
+            <label for="newUserConfirmPassword" class="form-label">Confirm Password</label>
+            <input type="password" class="form-control" id="newUserConfirmPassword" name="cpswd" placeholder="Confirm your password" required>
+            <span class="text-danger small" id="confirmPasswordError"></span>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn" form="addUserForm" style="background-color: #FFAA17;color: white;">Save User</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  let selectedUserId = null;
+
+  function showSection(button, section) {
+    document.querySelectorAll('#settingTabs button').forEach(btn => btn.classList.remove('active-setting'));
+    button.classList.add('active-setting');
+
+    const settingsContent = document.getElementById('settingsContent');
+    const adminPanelContent = document.getElementById('adminPanelContent');
+
+    settingsContent.querySelector('p')?.style.setProperty('display', 'none');
+
+    if (section === 'admin') {
+      adminPanelContent.style.display = 'block';
+    } else {
+      adminPanelContent.style.display = 'none';
+      settingsContent.querySelectorAll('h4, p:not(:first-child)').forEach(el => el.remove());
+
+      const heading = document.createElement('h4');
+      heading.textContent = section.charAt(0).toUpperCase() + section.slice(1) + ' Settings';
+      const paragraph = document.createElement('p');
+      paragraph.textContent = `Content for ${section} settings.`;
+
+      settingsContent.appendChild(heading);
+      settingsContent.appendChild(paragraph);
+    }
+  }
+
+  function generatePermissionCheckboxes(permissions) {
+    let html = `<div class="row mt-4">`;
+    const entries = Object.entries(permissions);
+    for (let i = 0; i < entries.length; i++) {
+      const [key, value] = entries[i];
+      html += `
+        <div class="col-12 col-sm-6 col-md-4 mb-2">
+          <div class="form-check d-flex align-items-center" style="gap: 8px;">
+            <input class="form-check-input" type="checkbox" id="${key}" ${value ? 'checked' : ''} style="transform: scale(0.85); margin: 0;">
+            <label class="form-check-label mb-0" for="${key}" style="font-size: 0.9rem;">${formatLabel(key)}</label>
+          </div>
+        </div>
+      `;
+    }
+    html += `</div>`;
+    return html;
+  }
+
+  function formatLabel(str) {
+    return str
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/[_-]/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+  }
+
+  function loadUserProfile(userElement) {
+    document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active-user'));
+    userElement.classList.add('active-user');
+
+    selectedUserId = userElement.dataset.userid;
+    const username = userElement.textContent.trim();
+    const email = userElement.dataset.email || '';
+
+    let moduleData = {};
+    try {
+      moduleData = userElement.dataset.modules ? JSON.parse(userElement.dataset.modules) : {};
+    } catch (err) {
+      console.error("Failed to parse module data for user:", selectedUserId);
+    }
+
+    Object.keys(moduleData).forEach(key => {
+      moduleData[key] = moduleData[key] === true || moduleData[key] === 1 || moduleData[key] === "1";
+    });
+
+    const permissionHTML = generatePermissionCheckboxes(moduleData);
+
+    document.getElementById('userProfileView').innerHTML = `
+      <div class="row">
+        <div class="col-md-4 d-flex flex-column justify-content-between">
+          <label class="form-label mb-3">Username</label>
+          <label class="form-label mb-3">Email</label>
+          <label class="form-label mb-3">Password</label>
+          <label class="form-label mb-3">Confirm Password</label>
+        </div>
+        <div class="col-md-4 d-flex flex-column justify-content-between">
+          <input type="text" id="editUsername" class="form-control mb-1" value="${username}">
+          <div class="text-danger small mb-2" id="usernameError"></div>
+
+          <input type="email" id="editEmail" class="form-control mb-1" value="${email}">
+          <div class="text-danger small mb-2" id="emailError"></div>
+
+          <input type="password" id="editPassword" class="form-control mb-1" placeholder="New password">
+          <div class="text-danger small mb-2" id="passwordError"></div>
+
+          <input type="password" id="editConfirmPassword" class="form-control mb-1" placeholder="Confirm password">
+          <div class="text-danger small mb-2" id="confirmPasswordError"></div>
+        </div>
+        <div class="col-md-4 d-flex justify-content-center align-items-center">
+          <button class="btn" onclick="submitUserEdit('${selectedUserId}')" style="background-color:#FFAA17;color:white;">Update Profile</button>
+        </div>
+      </div>
+      ${permissionHTML}
+    `;
+
+    setupLiveValidation();
+  }
+
+  function setupLiveValidation() {
+    const emailInput = document.getElementById('editEmail');
+    const passwordInput = document.getElementById('editPassword');
+    const confirmInput = document.getElementById('editConfirmPassword');
+
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const confirmError = document.getElementById('confirmPasswordError');
+
+    emailInput.addEventListener('input', () => {
+      const email = emailInput.value.trim();
+      const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      emailError.textContent = pattern.test(email) ? "" : "Invalid email format.";
+    });
+
+    confirmInput.addEventListener('input', () => {
+      confirmError.textContent =
+        confirmInput.value !== passwordInput.value ? "Passwords do not match." : "";
+    });
+
+    passwordInput.addEventListener('input', () => {
+      confirmError.textContent =
+        confirmInput.value !== "" && confirmInput.value !== passwordInput.value ? "Passwords do not match." : "";
+    });
+  }
+
+  function submitUserEdit(userId) {
+    const username = document.getElementById('editUsername').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    const password = document.getElementById('editPassword').value;
+    const confirmPassword = document.getElementById('editConfirmPassword').value;
+
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let valid = true;
+
+    if (!emailPattern.test(email)) {
+      emailError.textContent = "Invalid email format.";
+      valid = false;
+    } else {
+      emailError.textContent = "";
+    }
+
+    if (password && password.length < 6) {
+      passwordError.textContent = "Password must be at least 6 characters.";
+      valid = false;
+    } else {
+      passwordError.textContent = "";
+    }
+
+    if (password !== confirmPassword) {
+      confirmPasswordError.textContent = "Passwords do not match.";
+      valid = false;
+    } else {
+      confirmPasswordError.textContent = "";
+    }
+
+    if (!valid) return;
+
+    const permissionInputs = document.querySelectorAll('#userProfileView input[type="checkbox"]');
+    const updatedPermissions = {};
+    permissionInputs.forEach(input => {
+      updatedPermissions[input.id] = input.checked ? 1 : 0;
+    });
+
+    fetch(`/update_user_profile/${userId}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken()
+      },
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+        permissions: updatedPermissions
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert("User updated!");
+        const userItem = document.querySelector(`.user-item[data-userid="${userId}"]`);
+        if (userItem) {
+          userItem.textContent = username;
+          userItem.dataset.email = email;
+          userItem.dataset.modules = JSON.stringify(updatedPermissions);
+          loadUserProfile(userItem); 
+        }
+      } else {
+        alert("Update failed.");
+      }
+    })
+    .catch(error => {
+      console.error("Update error:", error);
+      alert("An error occurred.");
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.user-item').forEach(item => {
+      item.addEventListener('click', () => loadUserProfile(item));
+    });
+
+    document.getElementById('deleteUserBtn')?.addEventListener('click', () => {
+      if (!selectedUserId) {
+        alert("Please select a user to delete.");
+        return;
+      }
+
+      const userItem = document.querySelector('.user-item.active-user');
+      const username = userItem?.textContent.trim();
+
+      if (confirm(`Are you sure you want to delete ${username}?`)) {
+        fetch(`/delete_user/${selectedUserId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken()
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert("User deleted successfully.");
+            userItem?.remove();
+            document.getElementById('userProfileView').innerHTML = '';
+            selectedUserId = null;
+          } else {
+            alert("Deletion failed.");
+          }
+        })
+        .catch(error => {
+          console.error("Error deleting user:", error);
+          alert("An error occurred.");
+        });
+      }
+    });
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVpZVfGtnYVjprhUjra2iPzWTA7sVpLd2jN+smrR+8oP" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlcofrjrOkf2dAyj+h3BlJmEZFMchA5qfXjlO/IO/doJzERc" crossorigin="anonymous"></script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const emailInput = document.getElementById("newUserEmail");
+  const passwordInput = document.getElementById("newUserPassword");
+  const confirmPasswordInput = document.getElementById("newUserConfirmPassword");
+
+  const emailError = document.getElementById("emailError");
+  const passwordError = document.getElementById("passwordError");
+  const confirmPasswordError = document.getElementById("confirmPasswordError");
+
+  function validateEmail() {
+    const email = emailInput.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (email === "") {
+      emailError.textContent = "Email is required.";
+      emailInput.classList.add("is-invalid");
+    } else if (!emailRegex.test(email)) {
+      emailError.textContent = "Enter a valid email address.";
+      emailInput.classList.add("is-invalid");
+    } else {
+      emailError.textContent = "";
+      emailInput.classList.remove("is-invalid");
+    }
+  }
+
+function validatePassword() {
+  const password = passwordInput.value.trim();
+
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  if (password === "") {
+    passwordError.textContent = "Password is required.";
+    passwordInput.classList.add("is-invalid");
+  } else if (password.length < 6) {
+    passwordError.textContent = "Password must be at least 6 characters.";
+    passwordInput.classList.add("is-invalid");
+  } else if (!hasUppercase || !hasDigit || !hasSpecialChar) {
+    passwordError.textContent =
+      "Password must include at least 1 uppercase letter, 1 digit, and 1 special character.";
+    passwordInput.classList.add("is-invalid");
+  } else {
+    passwordError.textContent = "";
+    passwordInput.classList.remove("is-invalid");
+  }
+}
+
+  function validateConfirmPassword() {
+    const confirmPass = confirmPasswordInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (confirmPass === "") {
+      confirmPasswordError.textContent = "Confirm password is required.";
+      confirmPasswordInput.classList.add("is-invalid");
+    } else if (confirmPass !== password) {
+      confirmPasswordError.textContent = "Passwords do not match.";
+      confirmPasswordInput.classList.add("is-invalid");
+    } else {
+      confirmPasswordError.textContent = "";
+      confirmPasswordInput.classList.remove("is-invalid");
+    }
+  }
+
+  emailInput.addEventListener("input", validateEmail);
+  passwordInput.addEventListener("input", () => {
+    validatePassword();
+    validateConfirmPassword();
+  });
+  confirmPasswordInput.addEventListener("input", validateConfirmPassword);
+
+  document.getElementById("addUserForm").addEventListener("submit", function (e) {
+    validateEmail();
+    validatePassword();
+    validateConfirmPassword();
+
+    if (
+      emailInput.classList.contains("is-invalid") ||
+      passwordInput.classList.contains("is-invalid") ||
+      confirmPasswordInput.classList.contains("is-invalid")
+    ) {
+      e.preventDefault();
+      alert("Please fix the errors before submitting.");
+    }
+  });
+});
+</script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.location.hash === "#admin") {
+      const adminTabBtn = document.querySelector("button[onclick*='showSection'][onclick*='admin']");
+      if (adminTabBtn) {
+        adminTabBtn.click();
+      }
+    }
+  });
+</script>
+
+
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
+
+{% endblock %}
+
+
+{% block global_modals %}
+  {% include 'includes/quick_start_modal.html' %}
+{% endblock %}

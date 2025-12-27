@@ -1,0 +1,120 @@
+<style>
+  .modal .btn-close {
+    filter: invert(1); 
+    opacity: 1;
+  }
+
+  .modal .btn-close:hover {
+    opacity: 0.8;
+  }
+</style>
+
+
+
+<!-- templates/includes/quick_start_modal.html -->
+<div class="modal fade" id="quickWizardModal" tabindex="-1" aria-labelledby="quickWizardModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #FFAA17;color: white;">
+        <h5 class="modal-title" id="quickWizardModalLabel">Welcome to Quick Start Wizard</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Section: Company Details -->
+        <h6 class="mb-4">Company Details</h6>
+          {% if company %}
+            <form id="quickWizardForm"
+                  action="{% url 'edit_company' company.id %}"
+                  method="post"
+                  enctype="multipart/form-data">
+              {% csrf_token %}
+
+    <input type="hidden" name="next" value="/user_settings?open=company">
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="companyName" class="form-label">Company Name</label>
+            </div>
+            <div class="col-md-8">
+              <input type="text" id="companyName" name="company_name" class="form-control" placeholder="Enter company name" value="{{ company.company_name|default:'' }}">
+            </div>
+
+            <div class="col-md-4">
+              <label for="companyAddress" class="form-label">Address</label>
+            </div>
+            <div class="col-md-8">
+              <textarea id="companyAddress" name="company_address" class="form-control" rows="2" placeholder="Enter address">{{ company.address|default:'' }}</textarea>
+            </div>
+
+            <div class="col-md-4">
+              <label for="companyEmail" class="form-label">Email</label>
+            </div>
+            <div class="col-md-8">
+              <input type="email" id="companyEmail" name="company_email" class="form-control" placeholder="Enter email" value="{{ company.email|default:'' }}">
+            </div>
+
+            <div class="col-md-4">
+              <label for="taxNumber" class="form-label">Sales Tax Reg. No.</label>
+            </div>
+            <div class="col-md-8">
+              <input type="text" id="taxNumber" name="sales_tax" class="form-control" placeholder="Enter tax number" value="{{ company.sales_tax_reg_no|default:'' }}">
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <hr class="my-4">
+
+          <!-- Section: Company Logo -->
+          <h6 class="mb-3">Company Logo</h6>
+          <div class="row align-items-center mb-3">
+            <div class="col-md-4 text-center">
+          <img id="logoPreview" src="{{ logo.image.url }}" alt="Logo Preview" class="img-thumbnail" style="max-height: 200px;">
+            </div>
+            <div class="col-md-8">
+              <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" value="1" id="printLogo" name="print_logo"
+                {% if logo.print %}checked{% endif %}>
+                <label class="form-check-label" for="printLogo">
+                  Print Logo on Documents
+                </label>
+              </div>
+              <div>
+                <label for="logoUpload" class="form-label">Upload New Logo</label>
+                <input class="form-control" type="file" id="logoUpload" name="company_logo">
+              </div>
+            </div>
+          </div>
+      </div>
+
+            <!-- Modal Footer -->
+        <div class="modal-footer d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-sm" style="background-color: #FFAA17;color:white;">Save</button>
+      </div>
+        </form>
+{% endif %}
+
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const logoInput = document.getElementById('logoUpload');
+    const logoPreview = document.getElementById('logoPreview');
+
+    logoInput.addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          logoPreview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+</script>

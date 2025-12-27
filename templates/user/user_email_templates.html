@@ -1,0 +1,958 @@
+{% extends 'user/user_dashboard.html' %}
+{% block content %}
+
+   
+    <style>
+        body {
+            padding-top: 70px;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-btn {
+            width: 110px;
+            height: 100px;
+            padding: 12px 8px;
+            line-height: 1.2;
+            text-align: center;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        .settings-scroll-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 5px;
+        }
+
+        .settings-scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .settings-scroll-container::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .settings-scroll-container .btn {
+            min-width: 150px;
+            text-align: center;
+            white-space: normal;
+            margin-right: 2px;
+            border-radius: 0;
+            border: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+            color: #495057;
+            transition: 0.2s ease-in-out;
+        }
+
+        .settings-scroll-container .btn.active-setting {
+            background-color: #FFAA17;
+            color: white;
+            font-weight: 500;
+            z-index: 1;
+        }
+
+        .card {
+            border-radius: 10px;
+            background-color: #fff;
+            margin-bottom: 50px;
+        }
+
+        .modal-backdrop {
+            opacity: 0.2 !important; 
+        }
+
+       
+        .email-editor-container {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .email-toolbar {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 8px 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .email-toolbar .toolbar-group {
+            display: flex;
+            gap: 2px;
+            border-right: 1px solid #dee2e6;
+            padding-right: 8px;
+            margin-right: 8px;
+        }
+
+        .email-toolbar .toolbar-group:last-child {
+            border-right: none;
+            margin-right: 0;
+        }
+
+        .toolbar-btn {
+            border: 1px solid #ccc;
+            background: white;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+
+        .toolbar-btn:hover {
+            background: #e9ecef;
+        }
+
+        .toolbar-btn.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .font-select, .size-select {
+            border: 1px solid #ccc;
+            padding: 2px 6px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+
+        .email-content-area {
+            min-height: 400px;
+            padding: 15px;
+            border: none;
+            outline: none;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+       
+        .html-source-editor {
+            min-height: 400px;
+            padding: 15px;
+            border: none;
+            outline: none;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            background-color: #f8f9fa;
+            color: #333;
+            resize: vertical;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .view-toggle-buttons {
+            display: flex;
+            gap: 0;
+            margin-bottom: 15px;
+        }
+
+        .view-toggle-btn {
+            padding: 8px 16px;
+            border: 1px solid #dee2e6;
+            background: #f8f9fa;
+            color: #495057;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .view-toggle-btn:first-child {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .view-toggle-btn:last-child {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            border-left: none;
+        }
+
+        .view-toggle-btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .view-toggle-btn:hover:not(.active) {
+            background: #e9ecef;
+        }
+
+        .placeholders-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .placeholders-container {
+            background: white !important;
+            border: 1px solid #ccc !important;
+            border-radius: 4px;
+            padding: 15px !important;
+            min-height: 250px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .placeholder-list {
+            list-style: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .placeholder-list li {
+            padding: 8px 12px !important;
+            margin: 3px 0 !important;
+            cursor: pointer !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 14px !important;
+            color: #333 !important;
+            border-radius: 3px !important;
+            transition: background-color 0.2s !important;
+            display: block !important;
+            background-color: #f8f9fa !important;
+            border: 1px solid #dee2e6 !important;
+            line-height: 1.4 !important;
+        }
+
+        .placeholder-list li:hover {
+            background-color: #e9ecef !important;
+            border-color: #adb5bd !important;
+        }
+
+        .placeholder-list li:active {
+            background-color: #007bff !important;
+            color: white !important;
+            border-color: #007bff !important;
+        }
+
+        .placeholder-header {
+            font-size: 12px !important;
+            color: #666 !important;
+            margin-bottom: 10px !important;
+            font-style: italic !important;
+            font-weight: 500 !important;
+        }
+
+        .template-selector {
+            margin-bottom: 15px;
+        }
+
+        .save-btn {
+            background-color: #FFAA17;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background-color: #e6990f;
+        }
+
+        @media (max-width: 1024px) {
+            .top-buttons {
+                margin-top: 50px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-buttons {
+                margin-top: 0 !important;
+            }
+            
+            .email-toolbar {
+                padding: 5px;
+            }
+            
+            .toolbar-btn {
+                padding: 3px 6px;
+                font-size: 11px;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <div class="container">
+        <div class="d-flex justify-content-start mb-3 top-buttons gap-2">
+        
+            <a href="#" class="btn btn-outline-primary custom-btn text-center" data-bs-toggle="modal" data-bs-target="#quickWizardModal">
+             <i class="fas fa-play fa-lg mb-1"></i><br>
+            Quick Start<br>Wizard
+          </a>
+            <a href="#" class="btn btn-outline-primary custom-btn text-center">
+                <i class="fas fa-book fa-lg mb-1"></i><br>
+                Online<br>User Manual
+            </a>
+            <a href="#" class="btn btn-outline-primary custom-btn text-center">
+                <i class="fas fa-circle-up fa-lg mb-1"></i><br>
+                Upgrade to<br>PRO Now
+            </a>
+        </div>
+
+    <div class="card shadow-sm p-3">
+      <div class="settings-scroll-container mb-3 border-bottom pb-2">
+       <div class="d-flex flex-nowrap gap-1" id="settingTabs">
+        <a href="{% url 'user_miscellaneous_settings' %}" class="btn btn-light flex-shrink-0">Miscellaneous</a>
+        <a href="{% url 'user_settings' %}?open=company" class="btn btn-light flex-shrink-0">Company Settings</a>
+        <a href="{% url 'user_invoice_settings' %}?section=invoice" class="btn btn-light flex-shrink-0">Invoice Settings</a>
+        <a href="{% url 'user_order_settings' %}?section=order" class="btn btn-light flex-shrink-0">Order Settings</a>
+        <a href="{% url 'user_estimate_settings' %}?section=estimate" class="btn btn-light flex-shrink-0">Estimate Settings</a>
+        <a href="{% url 'user_advanced_settings' %}" class="btn btn-light flex-shrink-0">Advanced Settings</a>
+        <a href="{% url 'user_email_templates' %}" class="btn btn-light flex-shrink-0">Email Templates</a>
+        <a href="{% url 'user_payment_settings_view' %}" class="btn btn-light flex-shrink-0">payments</a>
+        <a href="{% url 'user_purchase_order' %}?section=purchase" class="btn btn-light flex-shrink-0">Purchase Order</a>
+      </div>
+    </div>
+
+            <div id="settingsContent" class="mt-3">
+          
+  <div id="EmailSettingsContent" style="display: block;">
+    <form id="emailTemplateForm" method="post" action="{% url 'user_save_email_template' %}">
+        {% csrf_token %}
+        <div class="row">
+           
+<div class="col-lg-8">
+    <div class="d-lg-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-2 mb-lg-0">Invoice E-Mail Template</h5>
+
+        <div class="d-flex flex-column flex-sm-row flex-lg-row align-items-stretch gap-2 mt-2 mt-lg-0">
+            <select class="form-select" style="min-width: 200px;" id="templateSelect" name="template_name" onchange="updatePlaceholders(); loadTemplateData();">
+                <option value="invoice">Invoice E-Mail Template</option>
+                <option value="estimate">Estimate E-Mail Template</option>
+                <option value="order">Order E-Mail Template</option>
+                <option value="payment">Payment Receipt Template</option>
+                <option value="purchase">Purchase Order E-Mail Template</option>
+            </select>
+            <button type="button" class="save-btn btn btn-primary" onclick="saveTemplate()">
+                <i class="fas fa-save"></i> Save Settings
+            </button>
+        </div>
+    </div>
+
+
+                <div class="view-toggle-buttons">
+                    <button type="button" class="view-toggle-btn active" id="emailViewBtn" onclick="switchToEmailView()">
+                        E-Mail message
+                    </button>
+                    <button type="button" class="view-toggle-btn" id="htmlViewBtn" onclick="switchToHtmlView()">
+                        HTML source code
+                    </button>
+                </div>
+
+                <div class="email-editor-container">
+                   
+                    <div class="email-toolbar" id="emailToolbar">
+                        <div class="toolbar-group">
+                            <button type="button" class="toolbar-btn" onclick="execCommand('undo')" title="Undo">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                            <button type="button" class="toolbar-btn" onclick="execCommand('redo')" title="Redo">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="toolbar-group">
+                            <button type="button" class="toolbar-btn" onclick="execCommand('bold')" title="Bold">
+                                <i class="fas fa-bold"></i>
+                            </button>
+                            <button type="button" class="toolbar-btn" onclick="execCommand('italic')" title="Italic">
+                                <i class="fas fa-italic"></i>
+                            </button>
+                            <button type="button" class="toolbar-btn" onclick="execCommand('underline')" title="Underline">
+                                <i class="fas fa-underline"></i>
+                            </button>
+                        </div>
+
+                        <div class="toolbar-group">
+                            <button type="button" class="toolbar-btn" onclick="execCommand('justifyLeft')" title="Align Left">
+                                <i class="fas fa-align-left"></i>
+                            </button>
+                            <button type="button" class="toolbar-btn" onclick="execCommand('justifyCenter')" title="Align Center">
+                                <i class="fas fa-align-center"></i>
+                            </button>
+                            <button type="button" class="toolbar-btn" onclick="execCommand('justifyRight')" title="Align Right">
+                                <i class="fas fa-align-right"></i>
+                            </button>
+                            <button type="button" class="toolbar-btn" onclick="execCommand('justifyFull')" title="Justify">
+                                <i class="fas fa-align-justify"></i>
+                            </button>
+                        </div>
+
+                        <div class="toolbar-group">
+                            <button type="button" class="toolbar-btn" onclick="execCommand('insertUnorderedList')" title="Bullet List">
+                                <i class="fas fa-list-ul"></i>
+                            </button>
+                            <button type="button" class="toolbar-btn" onclick="execCommand('insertOrderedList')" title="Numbered List">
+                                <i class="fas fa-list-ol"></i>
+                            </button>
+                        </div>
+
+                       <div class="toolbar-group">
+                            <select class="size-select" id="fontSizeSelect">
+                                <option value="1">8pt</option>
+                                <option value="2">10pt</option>
+                                <option value="3" selected>12pt</option>
+                                <option value="4">14pt</option>
+                                <option value="5">18pt</option>
+                                <option value="6">24pt</option>
+                                <option value="7">36pt</option>
+                            </select>
+                        </div>
+
+                        <div class="toolbar-group">
+                            <input type="color" id="textColorPicker" title="Text Color" style="width: 30px; height: 24px; padding: 2px;">
+                            <input type="color" id="bgColorPicker" title="Background Color" style="width: 30px; height: 24px; padding: 2px;">
+                        </div>
+                    </div>
+
+                   
+                    <div class="email-content-area" 
+                         contenteditable="true" 
+                         id="body"
+                         name="body"
+                         placeholder="Enter your email template content here..."
+                         style="display: block;">
+                        
+                    </div>
+
+                   
+                    <textarea class="html-source-editor" 
+                              id="html"
+                              name="html"
+                              placeholder="HTML source code will appear here..."
+                              style="display: none;"></textarea>
+                    
+                    
+                    <input type="hidden" id="hiddenBodyContent" name="body" value="">
+                    <input type="hidden" id="hiddenHtmlContent" name="html" value="">
+                </div>
+            </div>
+
+          
+            <div class="col-lg-4">
+                <div class="placeholders-panel">
+                    <h6 class="mb-3">Placeholders (drag or click to insert)</h6>
+                    <div class="placeholders-container">
+                        <div class="placeholder-header">Placeholders (drag or click to insert):</div>
+                        <ul class="placeholder-list" id="placeholderList">
+                           
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    
+    let currentView = 'email'; // 'email' or 'html'
+    let isLoading = false;
+    
+   
+    function switchToEmailView() {
+        if (currentView === 'html') {
+          
+            const htmlSource = document.getElementById('html').value;
+            document.getElementById('body').innerHTML = htmlSource;
+        }
+        
+        currentView = 'email';
+        
+        
+        document.getElementById('emailViewBtn').classList.add('active');
+        document.getElementById('htmlViewBtn').classList.remove('active');
+        
+     
+        document.getElementById('emailToolbar').style.display = 'flex';
+        document.getElementById('body').style.display = 'block';
+        document.getElementById('html').style.display = 'none';
+        
+      
+        document.getElementById('body').focus();
+    }
+    
+   
+    function switchToHtmlView() {
+        if (currentView === 'email') {
+          
+            const emailContent = document.getElementById('body').innerHTML;
+            document.getElementById('html').value = formatHtml(emailContent);
+        }
+        
+        currentView = 'html';
+        
+    
+        document.getElementById('emailViewBtn').classList.remove('active');
+        document.getElementById('htmlViewBtn').classList.add('active');
+        
+       
+        document.getElementById('emailToolbar').style.display = 'none';
+        document.getElementById('body').style.display = 'none';
+        document.getElementById('html').style.display = 'block';
+        
+      
+        document.getElementById('html').focus();
+    }
+    
+    function formatHtml(html) {
+   
+    let alignMatch = html.match(/text-align\s*:\s*(\w+)/i);
+    let textAlign = alignMatch ? alignMatch[1] : null;
+
+   
+    html = html
+        .replace(/<\/?div[^>]*>/gi, '')
+        .replace(/<\/?p[^>]*>/gi, '')
+        .replace(/<br\s*\/?>/gi, '')      
+        .replace(/^\s+|\s+$/g, '')       
+        .replace(/\n+/g, '');             
+
+  
+    if (!html.trim()) {
+        return '';
+    }
+
+   
+    const styleAttr = textAlign ? ` style="text-align: ${textAlign};"` : '';
+
+    return `<p${styleAttr}>${html}</p>`;
+}
+    
+ 
+    function insertPlaceholder(placeholder) {
+        console.log('Inserting placeholder:', placeholder);
+        
+        if (currentView === 'email') {
+            const editor = document.getElementById('body');
+            const selection = window.getSelection();
+            
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                const textNode = document.createTextNode(placeholder);
+                range.insertNode(textNode);
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            } else {
+               
+                const textNode = document.createTextNode(placeholder);
+                editor.appendChild(textNode);
+            }
+            
+            editor.focus();
+        } else {
+          
+            const htmlEditor = document.getElementById('html');
+            const cursorPos = htmlEditor.selectionStart;
+            const textBefore = htmlEditor.value.substring(0, cursorPos);
+            const textAfter = htmlEditor.value.substring(htmlEditor.selectionEnd);
+            
+            htmlEditor.value = textBefore + placeholder + textAfter;
+            htmlEditor.selectionStart = htmlEditor.selectionEnd = cursorPos + placeholder.length;
+            htmlEditor.focus();
+        }
+    }
+
+   
+    const fontSizeSelect = document.getElementById('fontSizeSelect');
+    if (fontSizeSelect) {
+        fontSizeSelect.addEventListener('change', function () {
+            const size = this.value;
+            const editor = document.getElementById('body');
+            editor.focus();
+            document.execCommand('fontSize', false, size);
+
+          
+            const fontElements = editor.getElementsByTagName("font");
+            for (let i = 0; i < fontElements.length; i++) {
+                if (fontElements[i].size == size) {
+                    const ptSizeMap = {
+                        1: '8pt', 2: '10pt', 3: '12pt', 4: '14pt', 5: '18pt', 6: '24pt', 7: '36pt'
+                    };
+                    fontElements[i].removeAttribute("size");
+                    fontElements[i].style.fontSize = ptSizeMap[size];
+                }
+            }
+        });
+    }
+
+  
+    const textColorPicker = document.getElementById('textColorPicker');
+    if (textColorPicker) {
+        textColorPicker.addEventListener('change', function () {
+            const color = this.value;
+            const editor = document.getElementById('body');
+            editor.focus();
+            document.execCommand('foreColor', false, color);
+        });
+    }
+
+    
+    const bgColorPicker = document.getElementById('bgColorPicker');
+    if (bgColorPicker) {
+        bgColorPicker.addEventListener('change', function () {
+            const color = this.value;
+            const editor = document.getElementById('body');
+            editor.focus();
+            document.execCommand('hiliteColor', false, color);
+        });
+    }
+
+   
+    function execCommand(command, value = null) {
+        document.execCommand(command, false, value);
+        document.getElementById('body').focus();
+    }
+
+    
+    function saveTemplate() {
+        if (isLoading) {
+            return; 
+        }
+        
+        isLoading = true;
+        const saveBtn = document.querySelector('.save-btn');
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        saveBtn.disabled = true;
+        
+        try {
+            // Sync content based on current view
+            let bodyContent, htmlContent;
+            
+            if (currentView === 'email') {
+                bodyContent = document.getElementById('body').innerHTML;
+                htmlContent = bodyContent; // Use the same content for HTML
+            } else {
+                htmlContent = document.getElementById('html').value;
+                bodyContent = htmlContent; // Use HTML content for body as well
+            }
+            
+            // Update hidden form fields
+            document.getElementById('hiddenBodyContent').value = bodyContent;
+            document.getElementById('hiddenHtmlContent').value = htmlContent;
+            
+            // Get form data
+            const form = document.getElementById('emailTemplateForm');
+            const formData = new FormData(form);
+            
+            // Submit via AJAX
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showNotification('Template saved successfully!', 'success');
+                } else {
+                    throw new Error(data.message || 'Unknown error occurred');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error saving template: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Reset button state
+                isLoading = false;
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            });
+            
+        } catch (error) {
+            console.error('Error preparing save:', error);
+            showNotification('Error preparing template data', 'error');
+            isLoading = false;
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
+        }
+    }
+    
+    // Function to show notifications
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+
+    // Function to load template data when dropdown changes
+    function loadTemplateData() {
+        if (isLoading) return;
+        
+        const templateType = document.getElementById('templateSelect').value;
+        
+        // Show loading state
+        const editor = document.getElementById('body');
+        const htmlEditor = document.getElementById('html');
+        const originalBodyContent = editor.innerHTML;
+        const originalHtmlContent = htmlEditor.value;
+        
+        editor.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;"><i class="fas fa-spinner fa-spin"></i> Loading template...</div>';
+        
+        fetch(`/get-email-template/?template_name=${encodeURIComponent(templateType)}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load template');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success && data.data) {
+                const templateData = data.data;
+                editor.innerHTML = templateData.body || '';
+                htmlEditor.value = templateData.html || templateData.body || '';
+            } else {
+                // No existing template found, clear content
+                editor.innerHTML = '';
+                htmlEditor.value = '';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading template:', error);
+            // Restore original content on error
+            editor.innerHTML = originalBodyContent;
+            htmlEditor.value = originalHtmlContent;
+            showNotification('Error loading template. Please try again.', 'error');
+        });
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM Content Loaded - Email Templates');
+        
+        // Initialize placeholders for the default template (invoice)
+        updatePlaceholders();
+        
+        // Add drop functionality to email content area
+        const emailContent = document.getElementById('body');
+        if (emailContent) {
+            emailContent.ondragover = function(e) { e.preventDefault(); };
+            emailContent.ondrop = function(e) {
+                e.preventDefault();
+                const placeholder = e.dataTransfer.getData('text/plain');
+                console.log('Dropped placeholder:', placeholder);
+                insertPlaceholder(placeholder);
+            };
+            
+            // Focus on email content area
+            emailContent.focus();
+        }
+        
+        // Update template dropdown change event
+        const templateSelect = document.getElementById('templateSelect');
+        if (templateSelect) {
+            templateSelect.addEventListener('change', function() {
+                // Update title
+                const titleElement = document.querySelector('h5.mb-2');
+                if (titleElement) {
+                    const templateNames = {
+                        'invoice': 'Invoice E-Mail Template',
+                        'estimate': 'Estimate E-Mail Template',
+                        'order': 'Order E-Mail Template',
+                        'payment': 'Payment Receipt Template',
+                        'purchase': 'Purchase Order E-Mail Template'
+                    };
+                    titleElement.textContent = templateNames[this.value] || 'E-Mail Template';
+                }
+                
+                // Update placeholders first, then load template data
+                updatePlaceholders();
+                loadTemplateData();
+            });
+        }
+        
+        // Load initial template data
+        loadTemplateData();
+        
+        // Add keyboard shortcut for save (Ctrl+S)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveTemplate();
+            }
+        });
+    });
+
+    // Placeholder data for different template types - Using string concatenation to avoid template processing
+    const placeholderData = {
+        invoice: [
+            '{' + '{Company_Name}' + '}',
+            '{' + '{Company_Address}' + '}',
+            '{' + '{Company_Email}' + '}',
+            '{' + '{Customer_Name}' + '}',
+            '{' + '{Customer_Address}' + '}',
+            '{' + '{Customer_Email}' + '}',
+            '{' + '{Invoice_Number}' + '}',
+            '{' + '{Invoice_Date}' + '}',
+            '{' + '{Invoice_Due_Date}' + '}',
+            '{' + '{Invoice_OrderRef}' + '}',
+            '{' + '{Invoice_Total}' + '}',
+            '{' + '{Invoice_Subtotal}' + '}',
+            '{' + '{Invoice_Balance}' + '}',
+            '{' + '{Current_Date}' + '}'
+        ],
+        estimate: [
+            '{' + '{Company_Name}' + '}',
+            '{' + '{Company_Address}' + '}',
+            '{' + '{Company_Email}' + '}',
+            '{' + '{Customer_Name}' + '}',
+            '{' + '{Customer_Address}' + '}',
+            '{' + '{Customer_Email}' + '}',
+            '{' + '{Estimate_Number}' + '}',
+            '{' + '{Estimate_Date}' + '}',
+            '{' + '{Estimate_Total}' + '}',
+            '{' + '{Estimate_Balance}' + '}',
+            '{' + '{Current_Date}' + '}'
+        ],
+        order: [
+            '{' + '{Company_Name}' + '}',
+            '{' + '{Company_Address}' + '}',
+            '{' + '{Company_Email}' + '}',
+            '{' + '{Customer_Name}' + '}',
+            '{' + '{Customer_Address}' + '}',
+            '{' + '{Customer_Email}' + '}',
+            '{' + '{Order_Number}' + '}',
+            '{' + '{Order_Date}' + '}',
+            '{' + '{Order_Total}' + '}',
+            '{' + '{Order_Balance}' + '}',
+            '{' + '{Current_Date}' + '}'
+        ],
+        payment: [
+            '{' + '{Company_Name}' + '}',
+            '{' + '{Company_Address}' + '}',
+            '{' + '{Company_Email}' + '}',
+            '{' + '{Customer_Name}' + '}',
+            '{' + '{Customer_Address}' + '}',
+            '{' + '{Customer_Email}' + '}',
+            '{' + '{Invoice_Number}' + '}',
+            '{' + '{Invoice_Date}' + '}',
+            '{' + '{Invoice_Due_Date}' + '}',
+            '{' + '{Invoice_OrderRef}' + '}',
+            '{' + '{Invoice_Total}' + '}',
+            '{' + '{Invoice_TotalPaid}' + '}',
+            '{' + '{Invoice_Balance}' + '}',
+            '{' + '{Current_Date}' + '}',
+            '{' + '{Currency}' + '}',
+            '{' + '{Currency_Sign}' + '}',
+            '{' + '{Payment_Date}' + '}',
+            '{' + '{Payment_Amount}' + '}',
+            '{' + '{Payment_Mode}' + '}',
+            '{' + '{Payment_Description}' + '}',
+            '{' + '{Payment_ID}' + '}',
+        ],
+        purchase: [
+            '{' + '{Company_Name}' + '}',
+            '{' + '{Company_Address}' + '}',
+            '{' + '{Company_Email}' + '}',
+            '{' + '{Customer_Name}' + '}',
+            '{' + '{Customer_Address}' + '}',
+            '{' + '{Customer_Email}' + '}',
+            '{' + '{Purchase_Order_Number}' + '}',
+            '{' + '{Purchase_Order_Date}' + '}',
+            '{' + '{Purchase_Order_Total}' + '}',
+            '{' + '{Current_Date}' + '}'
+        ]
+    };
+
+    // Update placeholders based on selected template
+    function updatePlaceholders() {
+        console.log('updatePlaceholders called');
+        
+        const templateSelect = document.getElementById('templateSelect');
+        const placeholderList = document.getElementById('placeholderList');
+        
+        if (!templateSelect || !placeholderList) {
+            console.error('Required elements not found');
+            return;
+        }
+        
+        const templateType = templateSelect.value;
+        console.log('Template type:', templateType);
+        
+      
+        const placeholders = placeholderData[templateType] || placeholderData.invoice;
+        console.log('Placeholders:', placeholders);
+        
+      
+        placeholderList.innerHTML = '';
+        
+       
+        placeholders.forEach(placeholder => {
+            const li = document.createElement('li');
+           
+            li.textContent = placeholder;
+            li.onclick = function() { 
+                console.log('Placeholder clicked:', placeholder);
+                insertPlaceholder(placeholder); 
+            };
+            li.ondblclick = function() { 
+                console.log('Placeholder double-clicked:', placeholder);
+                insertPlaceholder(placeholder); 
+            };
+            li.setAttribute('draggable', 'true');
+            li.ondragstart = function(e) { 
+                e.dataTransfer.setData('text/plain', placeholder); 
+            };
+            placeholderList.appendChild(li);
+        });
+        
+        console.log('Placeholders updated, count:', placeholderList.children.length);
+    }
+</script>
+
+{% endblock %}
+
+{% block global_modals %}
+  {% include 'includes/quick_start_modal.html' %}
+{% endblock %}
